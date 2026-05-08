@@ -1,13 +1,13 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { GameAnimations } = require("../game-animations.js");
+const { GameAnimations } = require("../shadows_game/game-animations.js");
 
 const {
     FINAL_MESSAGE,
     MatchingGame,
     RETRY_MESSAGE,
     START_MESSAGE,
-} = require("../game.js");
+} = require("../shadows_game/game.js");
 
 class FakeClassList {
     constructor(classes) {

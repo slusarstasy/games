@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Найди тень</title>
+    <title>Игры</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <main class="app">
-        <header class="top-bar">
-            <div>
-                <p class="eyebrow">Строительная техника</p>
-                <h1>Найди тень</h1>
-            </div>
-            <div class="score" aria-live="polite">
-                <span>Баллы:</span>
-                <strong id="score">0</strong>
-            </div>
+    <main class="games-hub">
+        <header class="hub-header">
+            <p class="eyebrow">Коллекция игр</p>
+            <h1>Выбери игру</h1>
         </header>
 
-        <section class="status-panel" aria-live="polite">
-            <p id="message">Выбери картинку и ее тень</p>
-        </section>
-
-        <section class="game-board" id="game-board" aria-label="Игровое поле">
-            <svg class="connection-layer" id="connection-layer" aria-hidden="true"></svg>
-
-            <div class="column" id="image-column" aria-label="Картинки техники"></div>
-            <div class="column" id="shadow-column" aria-label="Тени техники"></div>
+        <section class="games-grid" aria-label="Список игр">
+            <a class="game-card" href="shadows_game/index.html">
+                <span class="game-preview" aria-hidden="true">
+                    <img class="preview-image" src="data/images/1.PNG" alt="">
+                    <img class="preview-shadow" src="data/shadows/1.png" alt="">
+                </span>
+                <span class="game-info">
+                    <span class="game-kicker">Строительная техника</span>
+                    <span class="game-title">Угадываем тени</span>
+                    <span class="game-action">Играть</span>
+                </span>
+            </a>
         </section>
     </main>
-
-    <script src="game-animations.js"></script>
-    <script src="game.js"></script>
 </body>
 </html>

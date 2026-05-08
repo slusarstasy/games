@@ -1,33 +1,33 @@
 const VEHICLES = [
     {
         id: "1",
-        image: "data/images/1.PNG",
-        shadow: "data/shadows/1.png",
+        image: "../data/images/1.PNG",
+        shadow: "../data/shadows/1.png",
     },
     {
         id: "2",
-        image: "data/images/2.PNG",
-        shadow: "data/shadows/2.png",
+        image: "../data/images/2.PNG",
+        shadow: "../data/shadows/2.png",
     },
     {
         id: "3",
-        image: "data/images/3.PNG",
-        shadow: "data/shadows/3.png",
+        image: "../data/images/3.PNG",
+        shadow: "../data/shadows/3.png",
     },
     {
         id: "4",
-        image: "data/images/4.PNG",
-        shadow: "data/shadows/4.png",
+        image: "../data/images/4.PNG",
+        shadow: "../data/shadows/4.png",
     },
     {
         id: "5",
-        image: "data/images/5.PNG",
-        shadow: "data/shadows/5.png",
+        image: "../data/images/5.PNG",
+        shadow: "../data/shadows/5.png",
     },
     {
         id: "6",
-        image: "data/images/6.PNG",
-        shadow: "data/shadows/6.png",
+        image: "../data/images/6.PNG",
+        shadow: "../data/shadows/6.png",
     },
 ];
 
