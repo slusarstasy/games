@@ -84,16 +84,74 @@ class FakeLine {
     }
 }
 
+class FakeElement {
+    constructor(rect) {
+        this.__rect = rect;
+        this.animations = [];
+        this.attributes = new Map();
+        this.classList = new FakeClassList([]);
+        this.className = "";
+        this.dataset = {};
+        this.removed = false;
+        this.style = {};
+    }
+
+    setAttribute(name, value) {
+        this.attributes.set(name, value);
+    }
+
+    getBoundingClientRect() {
+        return this.__rect;
+    }
+
+    remove() {
+        this.removed = true;
+    }
+}
+
+class FakeBody {
+    constructor() {
+        this.children = [];
+    }
+
+    append(element) {
+        this.children.push(element);
+    }
+}
+
+class FakeDocument {
+    constructor() {
+        this.body = new FakeBody();
+        this.createdElements = [];
+    }
+
+    createElement() {
+        const element = new FakeElement({
+            bottom: 0,
+            height: 0,
+            left: 0,
+            right: 0,
+            top: 0,
+            width: 0,
+        });
+        recordPendingAnimations(element);
+        this.createdElements.push(element);
+
+        return element;
+    }
+
+    createElementNS() {
+        return new FakeLine();
+    }
+}
+
 async function withFakeDocument(callback) {
     const originalDocument = global.document;
-    global.document = {
-        createElementNS() {
-            return new FakeLine();
-        },
-    };
+    const fakeDocument = new FakeDocument();
+    global.document = fakeDocument;
 
     try {
-        await callback();
+        await callback(fakeDocument);
     } finally {
         global.document = originalDocument;
     }
@@ -127,6 +185,14 @@ function buildGame() {
         messageNode: { textContent: START_MESSAGE },
         score: 0,
         scoreNode: { textContent: "0" },
+        scorePanel: new FakeElement({
+            bottom: 50,
+            height: 40,
+            left: 300,
+            right: 380,
+            top: 10,
+            width: 80,
+        }),
         selectedImageId: "",
         selectedShadowId: "",
         shadowColumn: new FakeColumn(shadowCards),
@@ -135,6 +201,11 @@ function buildGame() {
             classList: new FakeClassList([]),
         },
     };
+}
+
+async function flushPromises() {
+    await Promise.resolve();
+    await Promise.resolve();
 }
 
 function setCardRect(card, rect) {
@@ -159,6 +230,25 @@ function recordAnimations(card) {
     card.animate = (keyframes, options) => {
         const animation = {
             finished: Promise.resolve(),
+            keyframes,
+            options,
+        };
+
+        card.animations.push(animation);
+        return animation;
+    };
+}
+
+function recordPendingAnimations(card) {
+    card.animate = (keyframes, options) => {
+        let finishAnimation;
+        const animation = {
+            finished: new Promise((resolve) => {
+                finishAnimation = resolve;
+            }),
+            finish() {
+                finishAnimation();
+            },
             keyframes,
             options,
         };
@@ -263,6 +353,109 @@ test("acceptPair scores, disables cards, moves pair, and draws a line", async ()
         assert.equal(game.connectionLayer.lines[0].attributes.get("y1"), "40");
         assert.equal(game.connectionLayer.lines[0].attributes.get("x2"), "120");
         assert.equal(game.connectionLayer.lines[0].attributes.get("y2"), "80");
+    });
+});
+
+test("acceptPair flies score impulse to the score panel before scoring", async () => {
+    await withFakeDocument(async (fakeDocument) => {
+        const originalWait = MatchingGame.wait;
+        MatchingGame.wait = () => Promise.resolve();
+
+        try {
+            const game = buildGame();
+            const imageCard = game.imageColumn.querySelector('[data-id="1"]');
+            const shadowCard = game.shadowColumn.querySelector('[data-id="1"]');
+            recordPendingAnimations(game.scorePanel);
+            setCardRect(imageCard, {
+                bottom: 140,
+                height: 20,
+                left: 30,
+                right: 70,
+                top: 120,
+                width: 40,
+            });
+            setCardRect(shadowCard, {
+                bottom: 140,
+                height: 20,
+                left: 130,
+                right: 170,
+                top: 120,
+                width: 40,
+            });
+            game.selectedImageId = "1";
+            game.selectedShadowId = "1";
+
+            const matchPromise = MatchingGame.checkPair(game);
+            await flushPromises();
+
+            assert.equal(game.connectionLayer.lines.length, 1);
+            assert.equal(game.score, 0);
+            assert.equal(game.scoreNode.textContent, "0");
+            assert.equal(fakeDocument.body.children.length, 1);
+
+            const impulse = fakeDocument.body.children[0];
+            assert.equal(impulse.className, "score-impulse");
+            assert.equal(impulse.style.left, "100px");
+            assert.equal(impulse.style.top, "130px");
+            assert.equal(impulse.animations.length, 1);
+
+            impulse.animations[0].finish();
+            await flushPromises();
+
+            assert.equal(impulse.animations.length, 2);
+            assert.equal(game.score, 0);
+            assert.equal(game.scoreNode.textContent, "0");
+            assert.equal(impulse.animations[1].keyframes[2].left, "340px");
+            assert.equal(impulse.animations[1].keyframes[2].top, "30px");
+
+            impulse.animations[1].finish();
+            await flushPromises();
+
+            assert.equal(impulse.removed, true);
+            assert.equal(game.score, 1);
+            assert.equal(game.scoreNode.textContent, "1");
+            assert.ok(game.scorePanel.classList.contains("is-score-awarded"));
+            assert.equal(game.scorePanel.animations.length, 1);
+
+            game.scorePanel.animations[0].finish();
+            await matchPromise;
+
+            assert.equal(
+                game.scorePanel.classList.contains("is-score-awarded"),
+                false,
+            );
+        } finally {
+            MatchingGame.wait = originalWait;
+        }
+    });
+});
+
+test("acceptPair scores without score animation when animate is unavailable", async () => {
+    await withFakeDocument(async (fakeDocument) => {
+        const game = buildGame();
+        const imageCard = game.imageColumn.querySelector('[data-id="1"]');
+        const shadowCard = game.shadowColumn.querySelector('[data-id="1"]');
+        setCardRect(imageCard, {
+            height: 20,
+            left: 30,
+            right: 70,
+            top: 50,
+        });
+        setCardRect(shadowCard, {
+            height: 20,
+            left: 130,
+            right: 170,
+            top: 90,
+        });
+        game.selectedImageId = "1";
+        game.selectedShadowId = "1";
+
+        await MatchingGame.checkPair(game);
+
+        assert.equal(fakeDocument.body.children.length, 0);
+        assert.equal(game.connectionLayer.lines.length, 1);
+        assert.equal(game.score, 1);
+        assert.equal(game.scoreNode.textContent, "1");
     });
 });
 

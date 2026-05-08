@@ -73,11 +73,42 @@ h1 {
     box-shadow: var(--shadow);
     font-size: 1.2rem;
     font-weight: 700;
+    transform-origin: center;
 }
 
 .score strong {
     color: var(--success);
     font-size: 2rem;
+}
+
+.score.is-score-awarded {
+    border-color: rgba(47, 158, 68, 0.8);
+    box-shadow:
+        0 0 0 8px rgba(47, 158, 68, 0.14),
+        var(--shadow);
+}
+
+.score-impulse {
+    position: fixed;
+    z-index: 20;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.96) 0,
+            rgba(255, 255, 255, 0.96) 17%,
+            rgba(142, 236, 144, 0.96) 30%,
+            rgba(47, 158, 68, 0.9) 58%,
+            rgba(47, 158, 68, 0) 72%
+        );
+    box-shadow:
+        0 0 0 10px rgba(47, 158, 68, 0.12),
+        0 0 24px rgba(47, 158, 68, 0.55);
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.8);
+    will-change: left, top, opacity, transform;
 }
 
 .status-panel {

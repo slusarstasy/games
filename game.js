@@ -43,6 +43,13 @@ const RETRY_MESSAGE = "Попробуй еще раз";
 const START_MESSAGE = "Выбери картинку и ее тень";
 const MATCH_MOVE_ANIMATION_DURATION_MS = 1500;
 const MATCH_MOVE_ANIMATION_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+const SCORE_FLASH_ANIMATION_DURATION_MS = 420;
+const SCORE_FLIGHT_DELAY_MS = 240;
+const SCORE_FLIGHT_ANIMATION_DURATION_MS = 3200;
+const SCORE_FLIGHT_MIDDLE_OFFSET = 0.42;
+const SCORE_PANEL_BUMP_ANIMATION_DURATION_MS = 360;
+const SCORE_AWARD_ANIMATION_EASING = "cubic-bezier(0.2, 0.86, 0.32, 1)";
+const SCORE_FLIGHT_FINISH_EASING = "cubic-bezier(0.35, 0, 1, 1)";
 
 class MatchingGame {
     constructor(config) {
@@ -50,6 +57,7 @@ class MatchingGame {
         this.imageColumn = config.imageColumn;
         this.shadowColumn = config.shadowColumn;
         this.connectionLayer = config.connectionLayer;
+        this.scorePanel = config.scorePanel;
         this.scoreNode = config.scoreNode;
         this.messageNode = config.messageNode;
         this.statusPanel = config.statusPanel;
@@ -157,8 +165,6 @@ class MatchingGame {
 
     static async acceptPair(game, id) {
         game.matchedIds.add(id);
-        game.score += 1;
-        game.scoreNode.textContent = String(game.score);
         game.isPairMoving = true;
 
         const imageCard = MatchingGame.findCard(game.imageColumn, id);
@@ -183,6 +189,7 @@ class MatchingGame {
         await MatchingGame.movePairToBottom(game, imageCard, shadowCard);
         MatchingGame.drawLine(game, id, imageCard, shadowCard);
         MatchingGame.redrawLines(game);
+        await MatchingGame.awardScore(game, imageCard, shadowCard);
         game.isPairMoving = false;
     }
 
@@ -314,6 +321,220 @@ class MatchingGame {
         ].join(" ");
     }
 
+    static async awardScore(game, imageCard, shadowCard) {
+        await MatchingGame.animateScoreAward(game, imageCard, shadowCard);
+        MatchingGame.incrementScore(game);
+        await MatchingGame.animateScorePanelBump(game);
+    }
+
+    static incrementScore(game) {
+        game.score += 1;
+        game.scoreNode.textContent = String(game.score);
+    }
+
+    static async animateScoreAward(game, imageCard, shadowCard) {
+        if (!MatchingGame.canCreateScoreImpulse()) {
+            return;
+        }
+
+        if (!MatchingGame.canAnimateScoreAward(game, imageCard, shadowCard)) {
+            return;
+        }
+
+        const impulse = MatchingGame.createScoreImpulse();
+
+        if (typeof impulse.animate !== "function") {
+            return;
+        }
+
+        const startPoint = MatchingGame.scoreAwardStartPoint(imageCard, shadowCard);
+        const endPoint = MatchingGame.rectCenter(game.scorePanel.getBoundingClientRect());
+
+        MatchingGame.positionScoreImpulse(impulse, startPoint);
+        document.body.append(impulse);
+
+        const flashAnimation = MatchingGame.animateScoreFlash(impulse);
+        await flashAnimation.finished;
+        await MatchingGame.wait(SCORE_FLIGHT_DELAY_MS);
+
+        const flightAnimation = MatchingGame.animateScoreFlight(
+            impulse,
+            startPoint,
+            endPoint,
+        );
+        await flightAnimation.finished;
+        impulse.remove();
+    }
+
+    static canCreateScoreImpulse() {
+        if (typeof document === "undefined") {
+            return false;
+        }
+
+        if (typeof document.createElement !== "function") {
+            return false;
+        }
+
+        if (document.body === undefined) {
+            return false;
+        }
+
+        return typeof document.body.append === "function";
+    }
+
+    static canAnimateScoreAward(game, imageCard, shadowCard) {
+        if (MatchingGame.prefersReducedMotion()) {
+            return false;
+        }
+
+        if (typeof game.scorePanel.animate !== "function") {
+            return false;
+        }
+
+        if (typeof game.scorePanel.getBoundingClientRect !== "function") {
+            return false;
+        }
+
+        if (typeof imageCard.getBoundingClientRect !== "function") {
+            return false;
+        }
+
+        return typeof shadowCard.getBoundingClientRect === "function";
+    }
+
+    static createScoreImpulse() {
+        const impulse = document.createElement("span");
+        impulse.className = "score-impulse";
+        impulse.setAttribute("aria-hidden", "true");
+
+        return impulse;
+    }
+
+    static positionScoreImpulse(impulse, point) {
+        impulse.style.left = `${point.x}px`;
+        impulse.style.top = `${point.y}px`;
+    }
+
+    static scoreAwardStartPoint(imageCard, shadowCard) {
+        const imagePoint = MatchingGame.rectCenter(imageCard.getBoundingClientRect());
+        const shadowPoint = MatchingGame.rectCenter(shadowCard.getBoundingClientRect());
+
+        return {
+            x: (imagePoint.x + shadowPoint.x) / 2,
+            y: (imagePoint.y + shadowPoint.y) / 2,
+        };
+    }
+
+    static rectCenter(rect) {
+        const width = rect.width !== undefined ? rect.width : rect.right - rect.left;
+        const height = rect.height !== undefined ? rect.height : rect.bottom - rect.top;
+
+        return {
+            x: rect.left + width / 2,
+            y: rect.top + height / 2,
+        };
+    }
+
+    static animateScoreFlash(impulse) {
+        return impulse.animate([
+            {
+                opacity: 0,
+                transform: "translate(-50%, -50%) scale(0.35)",
+            },
+            {
+                opacity: 1,
+                transform: "translate(-50%, -50%) scale(2.15)",
+            },
+            {
+                opacity: 0.95,
+                transform: "translate(-50%, -50%) scale(1)",
+            },
+        ], {
+            duration: SCORE_FLASH_ANIMATION_DURATION_MS,
+            easing: SCORE_AWARD_ANIMATION_EASING,
+            fill: "both",
+        });
+    }
+
+    static animateScoreFlight(impulse, startPoint, endPoint) {
+        const middlePoint = {
+            x: (startPoint.x + endPoint.x) / 2,
+            y: Math.min(startPoint.y, endPoint.y) - 54,
+        };
+
+        return impulse.animate([
+            {
+                easing: SCORE_AWARD_ANIMATION_EASING,
+                left: `${startPoint.x}px`,
+                opacity: 0.95,
+                top: `${startPoint.y}px`,
+                transform: "translate(-50%, -50%) scale(1)",
+            },
+            {
+                easing: SCORE_FLIGHT_FINISH_EASING,
+                left: `${middlePoint.x}px`,
+                offset: SCORE_FLIGHT_MIDDLE_OFFSET,
+                opacity: 1,
+                top: `${middlePoint.y}px`,
+                transform: "translate(-50%, -50%) scale(0.82)",
+            },
+            {
+                left: `${endPoint.x}px`,
+                opacity: 0,
+                top: `${endPoint.y}px`,
+                transform: "translate(-50%, -50%) scale(0.42)",
+            },
+        ], {
+            duration: SCORE_FLIGHT_ANIMATION_DURATION_MS,
+            easing: "linear",
+            fill: "both",
+        });
+    }
+
+    static async animateScorePanelBump(game) {
+        if (!MatchingGame.canAnimateScorePanelBump(game)) {
+            return;
+        }
+
+        game.scorePanel.classList.add("is-score-awarded");
+
+        const animation = game.scorePanel.animate([
+            {
+                transform: "scale(1)",
+            },
+            {
+                transform: "scale(1.08)",
+            },
+            {
+                transform: "scale(1)",
+            },
+        ], {
+            duration: SCORE_PANEL_BUMP_ANIMATION_DURATION_MS,
+            easing: SCORE_AWARD_ANIMATION_EASING,
+        });
+
+        await animation.finished;
+        game.scorePanel.classList.remove("is-score-awarded");
+    }
+
+    static canAnimateScorePanelBump(game) {
+        if (MatchingGame.prefersReducedMotion()) {
+            return false;
+        }
+
+        if (typeof game.scorePanel.animate !== "function") {
+            return false;
+        }
+
+        return game.scorePanel.classList !== undefined;
+    }
+
+    static wait(durationMs) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, durationMs);
+        });
+    }
+
     static drawLine(game, id, imageCard, shadowCard) {
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.dataset.id = id;
@@ -393,6 +614,7 @@ function main() {
         imageColumn: document.querySelector("#image-column"),
         shadowColumn: document.querySelector("#shadow-column"),
         connectionLayer: document.querySelector("#connection-layer"),
+        scorePanel: document.querySelector(".score"),
         scoreNode: document.querySelector("#score"),
         messageNode: document.querySelector("#message"),
         statusPanel: document.querySelector(".status-panel"),
