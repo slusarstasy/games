@@ -75,6 +75,7 @@ if __name__ == "__main__":
 
 # PROJECT SPECIFIC GUIDELINE
 * don't run e2e tests until you explicitly asked user permission
+* Write all future commit messages in Russian.
 * don't try to support backward compatability because I'm the only user of the project, instead, prefer clean code with extra logic for supporting previous developments
 * Don't use Optional arguments in order to avoid changing tests or to support backward compatability. It's better to update tests and don't care at all about compatability.
 * if you need some command which is expected to be run over and over again, move it to Makefile
