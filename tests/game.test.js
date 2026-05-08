@@ -1,5 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const { GameAnimations } = require("../game-animations.js");
 
 const {
     FINAL_MESSAGE,
@@ -358,8 +359,8 @@ test("acceptPair scores, disables cards, moves pair, and draws a line", async ()
 
 test("acceptPair flies score impulse to the score panel before scoring", async () => {
     await withFakeDocument(async (fakeDocument) => {
-        const originalWait = MatchingGame.wait;
-        MatchingGame.wait = () => Promise.resolve();
+        const originalWait = GameAnimations.wait;
+        GameAnimations.wait = () => Promise.resolve();
 
         try {
             const game = buildGame();
@@ -425,7 +426,7 @@ test("acceptPair flies score impulse to the score panel before scoring", async (
                 false,
             );
         } finally {
-            MatchingGame.wait = originalWait;
+            GameAnimations.wait = originalWait;
         }
     });
 });
