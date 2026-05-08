@@ -296,4 +296,18 @@ function main() {
     game.start();
 }
 
-main();
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+    main();
+}
+
+if (typeof module !== "undefined") {
+    module.exports = {
+        FINAL_MESSAGE,
+        MatchingGame,
+        PRAISE_MESSAGES,
+        RETRY_MESSAGE,
+        START_MESSAGE,
+        VEHICLES,
+        main,
+    };
+}
