@@ -41,6 +41,8 @@ const PRAISE_MESSAGES = [
 const FINAL_MESSAGE = "Ура! Все тени найдены!";
 const RETRY_MESSAGE = "Попробуй еще раз";
 const START_MESSAGE = "Выбери картинку и ее тень";
+const MATCH_MOVE_ANIMATION_DURATION_MS = 1500;
+const MATCH_MOVE_ANIMATION_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 class MatchingGame {
     constructor(config) {
@@ -57,6 +59,7 @@ class MatchingGame {
         this.matchedIds = new Set();
         this.score = 0;
         this.linesById = new Map();
+        this.isPairMoving = false;
     }
 
     start() {
@@ -112,27 +115,27 @@ class MatchingGame {
     static handleImageChoice(game, button) {
         const id = button.dataset.id;
 
-        if (MatchingGame.isAlreadyMatched(game, id)) {
-            return;
+        if (game.isPairMoving || MatchingGame.isAlreadyMatched(game, id)) {
+            return Promise.resolve();
         }
 
         game.selectedImageId = id;
         MatchingGame.clearSelection(game.imageColumn);
         button.classList.add("is-selected");
-        MatchingGame.checkPair(game);
+        return MatchingGame.checkPair(game);
     }
 
     static handleShadowChoice(game, button) {
         const id = button.dataset.id;
 
-        if (MatchingGame.isAlreadyMatched(game, id)) {
-            return;
+        if (game.isPairMoving || MatchingGame.isAlreadyMatched(game, id)) {
+            return Promise.resolve();
         }
 
         game.selectedShadowId = id;
         MatchingGame.clearSelection(game.shadowColumn);
         button.classList.add("is-selected");
-        MatchingGame.checkPair(game);
+        return MatchingGame.checkPair(game);
     }
 
     static isAlreadyMatched(game, id) {
@@ -141,21 +144,22 @@ class MatchingGame {
 
     static checkPair(game) {
         if (game.selectedImageId === "" || game.selectedShadowId === "") {
-            return;
+            return Promise.resolve();
         }
 
         if (game.selectedImageId === game.selectedShadowId) {
-            MatchingGame.acceptPair(game, game.selectedImageId);
-            return;
+            return MatchingGame.acceptPair(game, game.selectedImageId);
         }
 
         MatchingGame.rejectPair(game);
+        return Promise.resolve();
     }
 
-    static acceptPair(game, id) {
+    static async acceptPair(game, id) {
         game.matchedIds.add(id);
         game.score += 1;
         game.scoreNode.textContent = String(game.score);
+        game.isPairMoving = true;
 
         const imageCard = MatchingGame.findCard(game.imageColumn, id);
         const shadowCard = MatchingGame.findCard(game.shadowColumn, id);
@@ -164,21 +168,22 @@ class MatchingGame {
         imageCard.disabled = true;
         shadowCard.disabled = true;
 
-        MatchingGame.movePairToBottom(game, imageCard, shadowCard);
-        MatchingGame.drawLine(game, id, imageCard, shadowCard);
-        MatchingGame.redrawLines(game);
         MatchingGame.resetSelection(game);
 
         if (game.matchedIds.size === game.items.length) {
             MatchingGame.updateMessage(game, FINAL_MESSAGE, "is-finished");
-            return;
+        } else {
+            MatchingGame.updateMessage(
+                game,
+                MatchingGame.randomPraiseMessage(),
+                "is-success",
+            );
         }
 
-        MatchingGame.updateMessage(
-            game,
-            MatchingGame.randomPraiseMessage(),
-            "is-success",
-        );
+        await MatchingGame.movePairToBottom(game, imageCard, shadowCard);
+        MatchingGame.drawLine(game, id, imageCard, shadowCard);
+        MatchingGame.redrawLines(game);
+        game.isPairMoving = false;
     }
 
     static rejectPair(game) {
@@ -203,9 +208,110 @@ class MatchingGame {
         return column.querySelector(`[data-id="${id}"]`);
     }
 
-    static movePairToBottom(game, imageCard, shadowCard) {
+    static async movePairToBottom(game, imageCard, shadowCard) {
+        const imageStartRect = imageCard.getBoundingClientRect();
+        const shadowStartRect = shadowCard.getBoundingClientRect();
+
         game.imageColumn.append(imageCard);
         game.shadowColumn.append(shadowCard);
+        MatchingGame.redrawLines(game);
+
+        const imageEndRect = imageCard.getBoundingClientRect();
+        const shadowEndRect = shadowCard.getBoundingClientRect();
+
+        if (!MatchingGame.shouldAnimatePairMove(imageCard, shadowCard)) {
+            return;
+        }
+
+        game.board.classList.add("is-moving-match");
+        imageCard.classList.add("is-moving-match");
+        shadowCard.classList.add("is-moving-match");
+
+        const imageAnimation = MatchingGame.animateCardMove(
+            imageCard,
+            imageStartRect,
+            imageEndRect,
+            "image",
+        );
+        const shadowAnimation = MatchingGame.animateCardMove(
+            shadowCard,
+            shadowStartRect,
+            shadowEndRect,
+            "shadow",
+        );
+
+        await Promise.all([
+            imageAnimation.finished,
+            shadowAnimation.finished,
+        ]);
+
+        imageCard.classList.remove("is-moving-match");
+        shadowCard.classList.remove("is-moving-match");
+        game.board.classList.remove("is-moving-match");
+    }
+
+    static shouldAnimatePairMove(imageCard, shadowCard) {
+        if (typeof imageCard.animate !== "function") {
+            return false;
+        }
+
+        if (typeof shadowCard.animate !== "function") {
+            return false;
+        }
+
+        return !MatchingGame.prefersReducedMotion();
+    }
+
+    static prefersReducedMotion() {
+        if (typeof window === "undefined") {
+            return false;
+        }
+
+        if (typeof window.matchMedia !== "function") {
+            return false;
+        }
+
+        return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
+    static animateCardMove(card, startRect, endRect, kind) {
+        const deltaX = startRect.left - endRect.left;
+        const deltaY = startRect.top - endRect.top;
+        const rotateY = kind === "image" ? -72 : 72;
+        const keyframes = [
+            {
+                offset: 0,
+                transform: MatchingGame.buildMoveTransform(deltaX, deltaY, 0, 0),
+            },
+            {
+                offset: 0.48,
+                transform: MatchingGame.buildMoveTransform(
+                    deltaX / 2,
+                    deltaY / 2,
+                    10,
+                    rotateY,
+                ),
+            },
+            {
+                offset: 1,
+                transform: MatchingGame.buildMoveTransform(0, 0, 0, 0),
+            },
+        ];
+
+        return card.animate(keyframes, {
+            duration: MATCH_MOVE_ANIMATION_DURATION_MS,
+            easing: MATCH_MOVE_ANIMATION_EASING,
+            fill: "both",
+        });
+    }
+
+    static buildMoveTransform(deltaX, deltaY, rotateX, rotateY) {
+        return [
+            "perspective(900px)",
+            `translate(${deltaX}px, ${deltaY}px)`,
+            `rotateX(${rotateX}deg)`,
+            `rotateY(${rotateY}deg)`,
+        ].join(" ");
     }
 
     static drawLine(game, id, imageCard, shadowCard) {

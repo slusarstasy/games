@@ -188,6 +188,18 @@ h1 {
     cursor: default;
 }
 
+.game-board.is-moving-match .match-card:not(.is-matched) {
+    pointer-events: none;
+}
+
+.match-card.is-moving-match {
+    z-index: 4;
+    pointer-events: none;
+    transform-origin: center;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
 .match-card:disabled {
     opacity: 1;
 }

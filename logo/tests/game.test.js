@@ -31,6 +31,7 @@ class FakeCard {
         this.dataset = { id };
         this.classList = new FakeClassList(classes);
         this.disabled = false;
+        this.animations = [];
     }
 }
 
@@ -83,7 +84,7 @@ class FakeLine {
     }
 }
 
-function withFakeDocument(callback) {
+async function withFakeDocument(callback) {
     const originalDocument = global.document;
     global.document = {
         createElementNS() {
@@ -92,7 +93,7 @@ function withFakeDocument(callback) {
     };
 
     try {
-        callback();
+        await callback();
     } finally {
         global.document = originalDocument;
     }
@@ -110,6 +111,7 @@ function buildGame() {
 
     return {
         board: {
+            classList: new FakeClassList([]),
             getBoundingClientRect() {
                 return {
                     left: 10,
@@ -136,7 +138,34 @@ function buildGame() {
 }
 
 function setCardRect(card, rect) {
-    card.getBoundingClientRect = () => rect;
+    setCardRects(card, [rect]);
+}
+
+function setCardRects(card, rects) {
+    let currentIndex = 0;
+
+    card.getBoundingClientRect = () => {
+        const rect = rects[currentIndex];
+
+        if (currentIndex < rects.length - 1) {
+            currentIndex += 1;
+        }
+
+        return rect;
+    };
+}
+
+function recordAnimations(card) {
+    card.animate = (keyframes, options) => {
+        const animation = {
+            finished: Promise.resolve(),
+            keyframes,
+            options,
+        };
+
+        card.animations.push(animation);
+        return animation;
+    };
 }
 
 test("buildAriaLabel returns labels for images and shadows", () => {
@@ -199,8 +228,8 @@ test("rejectPair shows retry message and clears selected cards", () => {
     assert.equal(game.shadowColumn.querySelectorAll(".is-selected").length, 0);
 });
 
-test("acceptPair scores, disables cards, moves pair, and draws a line", () => {
-    withFakeDocument(() => {
+test("acceptPair scores, disables cards, moves pair, and draws a line", async () => {
+    await withFakeDocument(async () => {
         const game = buildGame();
         const imageCard = game.imageColumn.querySelector('[data-id="1"]');
         const shadowCard = game.shadowColumn.querySelector('[data-id="1"]');
@@ -219,7 +248,7 @@ test("acceptPair scores, disables cards, moves pair, and draws a line", () => {
         game.selectedImageId = "1";
         game.selectedShadowId = "1";
 
-        MatchingGame.checkPair(game);
+        await MatchingGame.checkPair(game);
 
         assert.equal(game.score, 1);
         assert.equal(game.scoreNode.textContent, "1");
@@ -237,8 +266,70 @@ test("acceptPair scores, disables cards, moves pair, and draws a line", () => {
     });
 });
 
-test("acceptPair shows final message after last match", () => {
-    withFakeDocument(() => {
+test("acceptPair animates matching cards before drawing the line", async () => {
+    await withFakeDocument(async () => {
+        const game = buildGame();
+        const imageCard = game.imageColumn.querySelector('[data-id="1"]');
+        const shadowCard = game.shadowColumn.querySelector('[data-id="1"]');
+        setCardRects(imageCard, [
+            {
+                height: 20,
+                left: 30,
+                right: 70,
+                top: 50,
+            },
+            {
+                height: 20,
+                left: 30,
+                right: 70,
+                top: 120,
+            },
+        ]);
+        setCardRects(shadowCard, [
+            {
+                height: 20,
+                left: 130,
+                right: 170,
+                top: 90,
+            },
+            {
+                height: 20,
+                left: 130,
+                right: 170,
+                top: 120,
+            },
+        ]);
+        recordAnimations(imageCard);
+        recordAnimations(shadowCard);
+        game.selectedImageId = "1";
+        game.selectedShadowId = "1";
+
+        const matchPromise = MatchingGame.checkPair(game);
+
+        assert.equal(game.connectionLayer.lines.length, 0);
+        assert.equal(imageCard.animations.length, 1);
+        assert.equal(shadowCard.animations.length, 1);
+        assert.equal(imageCard.animations[0].options.duration, 1500);
+        assert.match(imageCard.animations[0].keyframes[0].transform, /translate/);
+        assert.match(imageCard.animations[0].keyframes[1].transform, /rotateX/);
+        assert.match(imageCard.animations[0].keyframes[1].transform, /rotateY/);
+        assert.ok(imageCard.classList.contains("is-moving-match"));
+        assert.ok(shadowCard.classList.contains("is-moving-match"));
+        assert.ok(game.board.classList.contains("is-moving-match"));
+
+        await matchPromise;
+
+        assert.equal(game.connectionLayer.lines.length, 1);
+        assert.equal(game.connectionLayer.lines[0].attributes.get("y1"), "110");
+        assert.equal(game.connectionLayer.lines[0].attributes.get("y2"), "110");
+        assert.equal(imageCard.classList.contains("is-moving-match"), false);
+        assert.equal(shadowCard.classList.contains("is-moving-match"), false);
+        assert.equal(game.board.classList.contains("is-moving-match"), false);
+    });
+});
+
+test("acceptPair shows final message after last match", async () => {
+    await withFakeDocument(async () => {
         const game = buildGame();
         const imageCard = game.imageColumn.querySelector('[data-id="1"]');
         const shadowCard = game.shadowColumn.querySelector('[data-id="1"]');
@@ -258,7 +349,7 @@ test("acceptPair shows final message after last match", () => {
         game.selectedImageId = "1";
         game.selectedShadowId = "1";
 
-        MatchingGame.checkPair(game);
+        await MatchingGame.checkPair(game);
 
         assert.equal(game.messageNode.textContent, FINAL_MESSAGE);
         assert.ok(game.statusPanel.classList.contains("is-finished"));
