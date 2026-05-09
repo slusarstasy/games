@@ -167,6 +167,15 @@ function buildGame() {
         new FakeCard("2", []),
         new FakeCard("1", ["is-selected"]),
     ];
+    const scoreNode = new FakeElement({
+        bottom: 46,
+        height: 32,
+        left: 350,
+        right: 370,
+        top: 14,
+        width: 20,
+    });
+    scoreNode.textContent = "0";
 
     return {
         board: {
@@ -185,7 +194,7 @@ function buildGame() {
         matchedIds: new Set(),
         messageNode: { textContent: START_MESSAGE },
         score: 0,
-        scoreNode: { textContent: "0" },
+        scoreNode,
         scorePanel: new FakeElement({
             bottom: 50,
             height: 40,
@@ -357,7 +366,7 @@ test("acceptPair scores, disables cards, moves pair, and draws a line", async ()
     });
 });
 
-test("acceptPair flies score impulse to the score panel before scoring", async () => {
+test("acceptPair flies score impulse to the score number before scoring", async () => {
     await withFakeDocument(async (fakeDocument) => {
         const originalWait = GameAnimations.wait;
         GameAnimations.wait = () => Promise.resolve();
@@ -406,8 +415,9 @@ test("acceptPair flies score impulse to the score panel before scoring", async (
             assert.equal(impulse.animations.length, 2);
             assert.equal(game.score, 0);
             assert.equal(game.scoreNode.textContent, "0");
-            assert.equal(impulse.animations[1].keyframes[2].left, "340px");
-            assert.equal(impulse.animations[1].keyframes[2].top, "30px");
+            assert.equal(impulse.animations[1].keyframes.length, 2);
+            assert.equal(impulse.animations[1].keyframes[1].left, "360px");
+            assert.equal(impulse.animations[1].keyframes[1].top, "30px");
 
             impulse.animations[1].finish();
             await flushPromises();

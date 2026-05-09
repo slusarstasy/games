@@ -1,13 +1,10 @@
 (function () {
     const MATCH_MOVE_ANIMATION_DURATION_MS = 1500;
     const MATCH_MOVE_ANIMATION_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-    const SCORE_FLASH_ANIMATION_DURATION_MS = 420;
-    const SCORE_FLIGHT_DELAY_MS = 240;
+    const SCORE_FLASH_ANIMATION_DURATION_MS = 180;
     const SCORE_FLIGHT_ANIMATION_DURATION_MS = 3200;
-    const SCORE_FLIGHT_MIDDLE_OFFSET = 0.42;
     const SCORE_PANEL_BUMP_ANIMATION_DURATION_MS = 360;
     const SCORE_AWARD_ANIMATION_EASING = "cubic-bezier(0.2, 0.86, 0.32, 1)";
-    const SCORE_FLIGHT_FINISH_EASING = "cubic-bezier(0.35, 0, 1, 1)";
 
     class GameAnimations {
         static async movePairToBottom(config) {
@@ -127,13 +124,14 @@
             ].join(" ");
         }
 
-        static async playScoreAward(scorePanel, imageCard, shadowCard) {
+        static async playScoreAward(scorePanel, scoreTarget, imageCard, shadowCard) {
             if (!GameAnimations.canCreateScoreImpulse()) {
                 return;
             }
 
             if (!GameAnimations.canAnimateScoreAward(
                 scorePanel,
+                scoreTarget,
                 imageCard,
                 shadowCard,
             )) {
@@ -147,14 +145,13 @@
             }
 
             const startPoint = GameAnimations.scoreAwardStartPoint(imageCard, shadowCard);
-            const endPoint = GameAnimations.rectCenter(scorePanel.getBoundingClientRect());
+            const endPoint = GameAnimations.rectCenter(scoreTarget.getBoundingClientRect());
 
             GameAnimations.positionScoreImpulse(impulse, startPoint);
             document.body.append(impulse);
 
             const flashAnimation = GameAnimations.animateScoreFlash(impulse);
             await flashAnimation.finished;
-            await GameAnimations.wait(SCORE_FLIGHT_DELAY_MS);
 
             const flightAnimation = GameAnimations.animateScoreFlight(
                 impulse,
@@ -181,7 +178,7 @@
             return typeof document.body.append === "function";
         }
 
-        static canAnimateScoreAward(scorePanel, imageCard, shadowCard) {
+        static canAnimateScoreAward(scorePanel, scoreTarget, imageCard, shadowCard) {
             if (GameAnimations.prefersReducedMotion()) {
                 return false;
             }
@@ -191,6 +188,10 @@
             }
 
             if (typeof scorePanel.getBoundingClientRect !== "function") {
+                return false;
+            }
+
+            if (typeof scoreTarget.getBoundingClientRect !== "function") {
                 return false;
             }
 
@@ -262,26 +263,12 @@
         }
 
         static animateScoreFlight(impulse, startPoint, endPoint) {
-            const middlePoint = {
-                x: (startPoint.x + endPoint.x) / 2,
-                y: Math.min(startPoint.y, endPoint.y) - 54,
-            };
-
             return impulse.animate([
                 {
-                    easing: SCORE_AWARD_ANIMATION_EASING,
                     left: `${startPoint.x}px`,
                     opacity: 0.95,
                     top: `${startPoint.y}px`,
                     transform: "translate(-50%, -50%) scale(1)",
-                },
-                {
-                    easing: SCORE_FLIGHT_FINISH_EASING,
-                    left: `${middlePoint.x}px`,
-                    offset: SCORE_FLIGHT_MIDDLE_OFFSET,
-                    opacity: 1,
-                    top: `${middlePoint.y}px`,
-                    transform: "translate(-50%, -50%) scale(0.82)",
                 },
                 {
                     left: `${endPoint.x}px`,

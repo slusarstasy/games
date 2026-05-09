@@ -223,6 +223,7 @@ class MatchingGame {
     static async awardScore(game, imageCard, shadowCard) {
         await GameAnimations.playScoreAward(
             game.scorePanel,
+            game.scoreNode,
             imageCard,
             shadowCard,
         );
