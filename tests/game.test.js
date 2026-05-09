@@ -351,6 +351,8 @@ test("vehicle image and shadow assets exist", () => {
         const imagePath = path.resolve(gameDirectory, vehicle.image);
         const shadowPath = path.resolve(gameDirectory, vehicle.shadow);
 
+        assert.equal(vehicle.image, vehicle.image.normalize("NFC"));
+        assert.equal(vehicle.shadow, vehicle.shadow.normalize("NFC"));
         assert.equal(path.basename(vehicle.image), path.basename(vehicle.shadow));
         assert.equal(fs.existsSync(imagePath), true, vehicle.image);
         assert.equal(fs.existsSync(shadowPath), true, vehicle.shadow);

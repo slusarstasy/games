@@ -1,8 +1,8 @@
 const VEHICLES = [
     {
         id: "front-loader",
-        image: "../data/images/фронтальный_погрузчик.png",
-        shadow: "../data/shadows/фронтальный_погрузчик.png",
+        image: "../data/images/фронтальный_погрузчик.png",
+        shadow: "../data/shadows/фронтальный_погрузчик.png",
     },
     {
         id: "concrete-pump",
@@ -16,8 +16,8 @@ const VEHICLES = [
     },
     {
         id: "crew-bus",
-        image: "../data/images/вахтовый_автобус.png",
-        shadow: "../data/shadows/вахтовый_автобус.png",
+        image: "../data/images/вахтовый_автобус.png",
+        shadow: "../data/shadows/вахтовый_автобус.png",
     },
     {
         id: "mortar-pump",
@@ -26,8 +26,8 @@ const VEHICLES = [
     },
     {
         id: "tower-crane",
-        image: "../data/images/башенный_кран.png",
-        shadow: "../data/shadows/башенный_кран.png",
+        image: "../data/images/башенный_кран.png",
+        shadow: "../data/shadows/башенный_кран.png",
     },
 ];
 
