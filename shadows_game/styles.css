@@ -22,12 +22,18 @@
     display: inline-flex;
     align-items: center;
     justify-self: start;
-    gap: 8px;
+    gap: 9px;
+    font-size: 1.1rem;
 }
 
 .back-link .theme-icon {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
+}
+
+.back-link .theme-icon svg {
+    width: 17px;
+    height: 17px;
 }
 
 .title-group .theme-title {
