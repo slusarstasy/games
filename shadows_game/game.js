@@ -40,7 +40,7 @@ const PRAISE_MESSAGES = [
 
 const FINAL_MESSAGE = "Ура! Все тени найдены!";
 const RETRY_MESSAGE = "Попробуй еще раз";
-const START_MESSAGE = "Выбери картинку и ее тень";
+const START_MESSAGE = "Выбери картинку и ее тень. Скажи, для чего нужна каждая машина";
 const GameAnimations = (() => {
     if (typeof require !== "undefined") {
         return require("./game-animations.js").GameAnimations;
