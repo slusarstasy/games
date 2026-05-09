@@ -49,36 +49,6 @@
         transform 160ms ease;
 }
 
-.game-card::before,
-.game-card::after {
-    position: absolute;
-    z-index: 0;
-    content: "";
-    pointer-events: none;
-}
-
-.game-card::before {
-    right: -42px;
-    bottom: -28px;
-    width: 260px;
-    height: 130px;
-    border: 4px dashed rgba(212, 84, 23, 0.34);
-    border-radius: 999px;
-    transform: rotate(-10deg);
-}
-
-.game-card::after {
-    top: 24px;
-    right: 28px;
-    width: 78px;
-    height: 78px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 38% 38%, #f9cc63 0 18%, transparent 19%),
-        radial-gradient(circle at 64% 68%, #86a84d 0 18%, transparent 19%),
-        rgba(255, 250, 242, 0.74);
-}
-
 .game-card:hover,
 .game-card:focus-visible {
     outline: none;
@@ -187,11 +157,6 @@
     .game-card {
         grid-template-columns: 1fr;
         min-height: 0;
-    }
-
-    .game-card::before {
-        right: -88px;
-        bottom: -36px;
     }
 
     .game-preview {
