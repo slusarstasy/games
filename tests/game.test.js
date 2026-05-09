@@ -1,5 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { GameAnimations } = require("../shadows_game/game-animations.js");
 
 const {
@@ -8,6 +10,7 @@ const {
     PRAISE_MESSAGES,
     RETRY_MESSAGE,
     START_MESSAGE,
+    VEHICLES,
 } = require("../shadows_game/game.js");
 
 class FakeClassList {
@@ -339,6 +342,19 @@ test("rejectPair shows retry message and clears selected cards", () => {
     assert.equal(game.selectedShadowId, "");
     assert.equal(game.imageColumn.querySelectorAll(".is-selected").length, 0);
     assert.equal(game.shadowColumn.querySelectorAll(".is-selected").length, 0);
+});
+
+test("vehicle image and shadow assets exist", () => {
+    const gameDirectory = path.join(__dirname, "..", "shadows_game");
+
+    VEHICLES.forEach((vehicle) => {
+        const imagePath = path.resolve(gameDirectory, vehicle.image);
+        const shadowPath = path.resolve(gameDirectory, vehicle.shadow);
+
+        assert.equal(path.basename(vehicle.image), path.basename(vehicle.shadow));
+        assert.equal(fs.existsSync(imagePath), true, vehicle.image);
+        assert.equal(fs.existsSync(shadowPath), true, vehicle.shadow);
+    });
 });
 
 test("updateMessage restarts animation for feedback messages", () => {
