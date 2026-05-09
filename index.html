@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игры</title>
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <main class="games-hub">
+    <main class="games-hub page-shell">
         <header class="hub-header">
             <p class="eyebrow">Коллекция игр</p>
-            <h1>Выбери игру</h1>
+            <h1 class="theme-title">Выбери игру</h1>
         </header>
 
         <section class="games-grid" aria-label="Список игр">
-            <a class="game-card" href="shadows_game/index.html">
+            <a class="game-card theme-panel" href="shadows_game/index.html">
                 <span class="game-preview" aria-hidden="true">
                     <img class="preview-image" src="data/images/1.PNG" alt="">
                     <img class="preview-shadow" src="data/shadows/1.png" alt="">
@@ -22,7 +23,14 @@
                 <span class="game-info">
                     <span class="game-kicker">Строительная техника</span>
                     <span class="game-title">Угадываем тени</span>
-                    <span class="game-action">Играть</span>
+                    <span class="game-action theme-button">
+                        <span class="theme-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path d="M5 3.2v9.6L12.4 8 5 3.2Z"></path>
+                            </svg>
+                        </span>
+                        Играть
+                    </span>
                 </span>
             </a>
         </section>
