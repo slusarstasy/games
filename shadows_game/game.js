@@ -194,7 +194,7 @@ class MatchingGame {
         });
         MatchingGame.drawLine(game, id, imageCard, shadowCard);
         MatchingGame.redrawLines(game);
-        await MatchingGame.awardScore(game, imageCard, shadowCard);
+        MatchingGame.awardScore(game, imageCard, shadowCard);
         game.isPairMoving = false;
     }
 

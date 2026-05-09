@@ -366,7 +366,7 @@ test("acceptPair scores, disables cards, moves pair, and draws a line", async ()
     });
 });
 
-test("acceptPair flies score impulse to the score number before scoring", async () => {
+test("acceptPair starts score impulse without blocking the next choice", async () => {
     await withFakeDocument(async (fakeDocument) => {
         const originalWait = GameAnimations.wait;
         GameAnimations.wait = () => Promise.resolve();
@@ -401,6 +401,7 @@ test("acceptPair flies score impulse to the score number before scoring", async 
             assert.equal(game.connectionLayer.lines.length, 1);
             assert.equal(game.score, 0);
             assert.equal(game.scoreNode.textContent, "0");
+            assert.equal(game.isPairMoving, false);
             assert.equal(fakeDocument.body.children.length, 1);
 
             const impulse = fakeDocument.body.children[0];
@@ -418,6 +419,12 @@ test("acceptPair flies score impulse to the score number before scoring", async 
             assert.equal(impulse.animations[1].keyframes.length, 2);
             assert.equal(impulse.animations[1].keyframes[1].left, "360px");
             assert.equal(impulse.animations[1].keyframes[1].top, "30px");
+
+            MatchingGame.handleImageChoice(
+                game,
+                game.imageColumn.querySelector('[data-id="2"]'),
+            );
+            assert.equal(game.selectedImageId, "2");
 
             impulse.animations[1].finish();
             await flushPromises();
