@@ -287,32 +287,36 @@ class MatchingGame {
     static updateMessage(game, message, stateClass) {
         game.messageNode.textContent = message;
         game.statusPanel.className = "status-panel";
-        MatchingGame.resetPraiseAnimation(game.messageNode);
+        MatchingGame.resetMessageAnimation(game.messageNode);
 
         if (stateClass !== "") {
             game.statusPanel.classList.add(stateClass);
         }
 
-        if (stateClass === "is-success") {
-            MatchingGame.startPraiseAnimation(game.messageNode);
+        if (MatchingGame.shouldAnimateMessage(stateClass)) {
+            MatchingGame.startMessageAnimation(game.messageNode);
         }
     }
 
-    static startPraiseAnimation(messageNode) {
-        MatchingGame.resetPraiseAnimation(messageNode);
+    static shouldAnimateMessage(stateClass) {
+        return ["is-success", "is-wrong", "is-finished"].includes(stateClass);
+    }
+
+    static startMessageAnimation(messageNode) {
+        MatchingGame.resetMessageAnimation(messageNode);
 
         if (messageNode.offsetWidth !== undefined) {
             void messageNode.offsetWidth;
         }
 
         if (messageNode.classList !== undefined) {
-            messageNode.classList.add("is-praise-animated");
+            messageNode.classList.add("is-message-animated");
         }
     }
 
-    static resetPraiseAnimation(messageNode) {
+    static resetMessageAnimation(messageNode) {
         if (messageNode.classList !== undefined) {
-            messageNode.classList.remove("is-praise-animated");
+            messageNode.classList.remove("is-message-animated");
         }
     }
 

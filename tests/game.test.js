@@ -341,20 +341,26 @@ test("rejectPair shows retry message and clears selected cards", () => {
     assert.equal(game.shadowColumn.querySelectorAll(".is-selected").length, 0);
 });
 
-test("updateMessage restarts praise animation for every success message", () => {
+test("updateMessage restarts animation for feedback messages", () => {
     const game = buildGame();
 
     MatchingGame.updateMessage(game, "Молодец!", "is-success");
     assert.equal(game.messageNode.textContent, "Молодец!");
-    assert.ok(game.messageNode.classList.contains("is-praise-animated"));
+    assert.ok(game.messageNode.classList.contains("is-message-animated"));
 
     MatchingGame.updateMessage(game, "Отлично!", "is-success");
     assert.equal(game.messageNode.textContent, "Отлично!");
-    assert.ok(game.messageNode.classList.contains("is-praise-animated"));
+    assert.ok(game.messageNode.classList.contains("is-message-animated"));
 
     MatchingGame.updateMessage(game, RETRY_MESSAGE, "is-wrong");
+    assert.ok(game.messageNode.classList.contains("is-message-animated"));
+
+    MatchingGame.updateMessage(game, FINAL_MESSAGE, "is-finished");
+    assert.ok(game.messageNode.classList.contains("is-message-animated"));
+
+    MatchingGame.updateMessage(game, START_MESSAGE, "");
     assert.equal(
-        game.messageNode.classList.contains("is-praise-animated"),
+        game.messageNode.classList.contains("is-message-animated"),
         false,
     );
 });

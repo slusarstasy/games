@@ -115,13 +115,14 @@
     line-height: 1.05;
 }
 
-.status-panel.is-success p.is-praise-animated {
-    animation: praise-pop 1s ease-out both;
-}
-
 .status-panel.is-wrong {
     border-color: rgba(212, 84, 23, 0.28);
     background: #fff0e5;
+}
+
+.status-panel.is-wrong p {
+    font-size: clamp(1.65rem, 3.6vw, 2.75rem);
+    line-height: 1.05;
 }
 
 .status-panel.is-finished {
@@ -131,9 +132,15 @@
 
 .status-panel.is-finished p {
     color: var(--theme-heading);
+    font-size: clamp(1.7rem, 3.8vw, 2.9rem);
+    line-height: 1.05;
 }
 
-@keyframes praise-pop {
+.status-panel p.is-message-animated {
+    animation: message-pop 1s ease-out both;
+}
+
+@keyframes message-pop {
     0% {
         opacity: 0;
         transform: scale(0.72);
