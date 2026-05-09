@@ -36,6 +36,8 @@ const PRAISE_MESSAGES = [
     "Верно!",
     "Здорово получилось!",
     "Молодец!",
+    "Супер!",
+    "Класс!",
 ];
 
 const FINAL_MESSAGE = "Ура! Все тени найдены!";
@@ -64,6 +66,7 @@ class MatchingGame {
         this.selectedShadowId = "";
         this.matchedIds = new Set();
         this.score = 0;
+        this.praiseMessageIndex = 0;
         this.linesById = new Map();
         this.isPairMoving = false;
     }
@@ -179,7 +182,7 @@ class MatchingGame {
         } else {
             MatchingGame.updateMessage(
                 game,
-                MatchingGame.randomPraiseMessage(),
+                MatchingGame.nextPraiseMessage(game),
                 "is-success",
             );
         }
@@ -284,15 +287,40 @@ class MatchingGame {
     static updateMessage(game, message, stateClass) {
         game.messageNode.textContent = message;
         game.statusPanel.className = "status-panel";
+        MatchingGame.resetPraiseAnimation(game.messageNode);
 
         if (stateClass !== "") {
             game.statusPanel.classList.add(stateClass);
         }
+
+        if (stateClass === "is-success") {
+            MatchingGame.startPraiseAnimation(game.messageNode);
+        }
     }
 
-    static randomPraiseMessage() {
-        const index = Math.floor(Math.random() * PRAISE_MESSAGES.length);
-        return PRAISE_MESSAGES[index];
+    static startPraiseAnimation(messageNode) {
+        MatchingGame.resetPraiseAnimation(messageNode);
+
+        if (messageNode.offsetWidth !== undefined) {
+            void messageNode.offsetWidth;
+        }
+
+        if (messageNode.classList !== undefined) {
+            messageNode.classList.add("is-praise-animated");
+        }
+    }
+
+    static resetPraiseAnimation(messageNode) {
+        if (messageNode.classList !== undefined) {
+            messageNode.classList.remove("is-praise-animated");
+        }
+    }
+
+    static nextPraiseMessage(game) {
+        const message = PRAISE_MESSAGES[game.praiseMessageIndex];
+        game.praiseMessageIndex = (game.praiseMessageIndex + 1) % PRAISE_MESSAGES.length;
+
+        return message;
     }
 
     static shuffle(items) {

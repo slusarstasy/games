@@ -5,6 +5,7 @@ const { GameAnimations } = require("../shadows_game/game-animations.js");
 const {
     FINAL_MESSAGE,
     MatchingGame,
+    PRAISE_MESSAGES,
     RETRY_MESSAGE,
     START_MESSAGE,
 } = require("../shadows_game/game.js");
@@ -93,8 +94,10 @@ class FakeElement {
         this.classList = new FakeClassList([]);
         this.className = "";
         this.dataset = {};
+        this.offsetWidth = rect.width;
         this.removed = false;
         this.style = {};
+        this.textContent = "";
     }
 
     setAttribute(name, value) {
@@ -176,6 +179,15 @@ function buildGame() {
         width: 20,
     });
     scoreNode.textContent = "0";
+    const messageNode = new FakeElement({
+        bottom: 0,
+        height: 0,
+        left: 0,
+        right: 0,
+        top: 0,
+        width: 0,
+    });
+    messageNode.textContent = START_MESSAGE;
 
     return {
         board: {
@@ -192,7 +204,8 @@ function buildGame() {
         items: [{ id: "1" }, { id: "2" }],
         linesById: new Map(),
         matchedIds: new Set(),
-        messageNode: { textContent: START_MESSAGE },
+        messageNode,
+        praiseMessageIndex: 0,
         score: 0,
         scoreNode,
         scorePanel: new FakeElement({
@@ -326,6 +339,32 @@ test("rejectPair shows retry message and clears selected cards", () => {
     assert.equal(game.selectedShadowId, "");
     assert.equal(game.imageColumn.querySelectorAll(".is-selected").length, 0);
     assert.equal(game.shadowColumn.querySelectorAll(".is-selected").length, 0);
+});
+
+test("updateMessage restarts praise animation for every success message", () => {
+    const game = buildGame();
+
+    MatchingGame.updateMessage(game, "Молодец!", "is-success");
+    assert.equal(game.messageNode.textContent, "Молодец!");
+    assert.ok(game.messageNode.classList.contains("is-praise-animated"));
+
+    MatchingGame.updateMessage(game, "Отлично!", "is-success");
+    assert.equal(game.messageNode.textContent, "Отлично!");
+    assert.ok(game.messageNode.classList.contains("is-praise-animated"));
+
+    MatchingGame.updateMessage(game, RETRY_MESSAGE, "is-wrong");
+    assert.equal(
+        game.messageNode.classList.contains("is-praise-animated"),
+        false,
+    );
+});
+
+test("nextPraiseMessage uses each praise before repeating", () => {
+    const game = buildGame();
+    const messages = PRAISE_MESSAGES.map(() => MatchingGame.nextPraiseMessage(game));
+
+    assert.deepEqual(messages, PRAISE_MESSAGES);
+    assert.equal(MatchingGame.nextPraiseMessage(game), PRAISE_MESSAGES[0]);
 });
 
 test("acceptPair scores, disables cards, moves pair, and draws a line", async () => {

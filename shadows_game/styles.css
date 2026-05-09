@@ -111,6 +111,12 @@
 
 .status-panel.is-success p {
     color: var(--theme-success);
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    line-height: 1.05;
+}
+
+.status-panel.is-success p.is-praise-animated {
+    animation: praise-pop 1s ease-out both;
 }
 
 .status-panel.is-wrong {
@@ -125,6 +131,23 @@
 
 .status-panel.is-finished p {
     color: var(--theme-heading);
+}
+
+@keyframes praise-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.72);
+    }
+
+    55% {
+        opacity: 1;
+        transform: scale(1.14);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .game-board {
