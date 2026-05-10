@@ -135,6 +135,8 @@
 .equipment-reader {
     position: sticky;
     top: 18px;
+    justify-self: end;
+    width: min(100%, 540px);
     min-height: min(760px, calc(100vh - 52px));
     padding: clamp(18px, 2.5vw, 28px);
     background: var(--theme-panel);
@@ -226,11 +228,11 @@
 }
 
 .audio-button-listen {
-    background: var(--theme-accent);
+    background: var(--theme-heading);
 }
 
 .audio-button-pause {
-    background: var(--theme-heading);
+    background: var(--theme-accent);
 }
 
 .audio-button-icon {
@@ -265,12 +267,12 @@
 
 .audio-button-listen:hover,
 .audio-button-listen:focus-visible {
-    background: var(--theme-accent-strong);
+    background: #3f746d;
 }
 
 .audio-button-pause:hover,
 .audio-button-pause:focus-visible {
-    background: #3f746d;
+    background: var(--theme-accent-strong);
 }
 
 .audio-button:active {
@@ -316,6 +318,8 @@
 
     .equipment-reader {
         position: static;
+        justify-self: stretch;
+        width: 100%;
         min-height: 0;
     }
 
