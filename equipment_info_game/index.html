@@ -26,51 +26,63 @@
         <section class="learning-board" aria-label="Знакомство со строительной техникой">
             <section class="equipment-list" id="equipment-list" aria-label="Карточки техники"></section>
 
-            <aside class="equipment-reader theme-panel" aria-live="polite">
-                <div class="empty-state" id="empty-state">
-                    <p>Выбери машину</p>
-                </div>
-
-                <article class="equipment-details" id="equipment-details" hidden>
-                    <p class="eyebrow" id="equipment-category"></p>
-                    <h2 id="equipment-title"></h2>
-
-                    <div class="equipment-hero">
-                        <img id="equipment-image" src="" alt="">
+            <div class="equipment-side">
+                <aside class="equipment-reader theme-panel" aria-live="polite">
+                    <div class="empty-state" id="empty-state">
+                        <p>Выбери машину</p>
                     </div>
 
-                    <div class="audio-controls">
-                        <button
-                            class="theme-button audio-button audio-button-listen"
-                            id="listen-audio"
-                            type="button"
-                            hidden
-                        >
-                            <span class="audio-button-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M5 3.4v9.2L12.2 8 5 3.4Z"></path>
-                                </svg>
-                            </span>
-                            <span>Слушать</span>
-                        </button>
-                        <button
-                            class="theme-button audio-button audio-button-pause"
-                            id="pause-audio"
-                            type="button"
-                            hidden
-                        >
-                            <span class="audio-button-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M4 3h3v10H4V3Zm5 0h3v10H9V3Z"></path>
-                                </svg>
-                            </span>
-                            <span>Пауза</span>
-                        </button>
-                    </div>
+                    <article class="equipment-details" id="equipment-details" hidden>
+                        <p class="eyebrow" id="equipment-category"></p>
+                        <h2 id="equipment-title"></h2>
 
-                    <dl class="equipment-facts" id="equipment-facts"></dl>
-                </article>
-            </aside>
+                        <div class="equipment-hero">
+                            <img id="equipment-image" src="" alt="">
+                        </div>
+
+                        <div class="audio-controls">
+                            <button
+                                class="theme-button audio-button audio-button-listen"
+                                id="listen-audio"
+                                type="button"
+                                hidden
+                            >
+                                <span class="audio-button-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 16 16" focusable="false">
+                                        <path d="M5 3.4v9.2L12.2 8 5 3.4Z"></path>
+                                    </svg>
+                                </span>
+                                <span>Слушать</span>
+                            </button>
+                            <button
+                                class="theme-button audio-button audio-button-pause"
+                                id="pause-audio"
+                                type="button"
+                                hidden
+                            >
+                                <span class="audio-button-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 16 16" focusable="false">
+                                        <path d="M4 3h3v10H4V3Zm5 0h3v10H9V3Z"></path>
+                                    </svg>
+                                </span>
+                                <span>Пауза</span>
+                            </button>
+                        </div>
+
+                        <dl class="equipment-facts" id="equipment-facts"></dl>
+                    </article>
+                </aside>
+
+                <section
+                    class="equipment-questions theme-panel"
+                    id="equipment-questions-panel"
+                    aria-label="Вопросы по технике"
+                    hidden
+                >
+                    <h2>Вопросы</h2>
+                    <ol id="equipment-questions"></ol>
+                </section>
+            </div>
         </section>
     </main>
 

@@ -42,6 +42,42 @@ const DETAIL_FIELDS = [
     },
 ];
 
+const QUESTION_COUNT = 3;
+const QUESTION_FIELDS = [
+    {
+        key: "workplace",
+        question: "Где работает эта техника?",
+    },
+    {
+        key: "size",
+        question: "Какого размера эта техника?",
+    },
+    {
+        key: "parts",
+        question: "Какие части есть у этой техники?",
+    },
+    {
+        key: "action",
+        question: "Что делает эта техника?",
+    },
+    {
+        key: "process",
+        question: "Как работает эта техника?",
+    },
+    {
+        key: "sound",
+        question: "Какой звук у этой техники?",
+    },
+    {
+        key: "operator",
+        question: "Кто работает на этой технике?",
+    },
+    {
+        key: "purpose",
+        question: "Для чего нужна эта техника?",
+    },
+];
+
 const VOICE_VOLUME = 1;
 const GameSounds = (() => {
     if (typeof require !== "undefined") {
@@ -318,6 +354,8 @@ class EquipmentInfoGame {
         this.titleNode = config.titleNode;
         this.imageNode = config.imageNode;
         this.factsNode = config.factsNode;
+        this.questionsPanelNode = config.questionsPanelNode;
+        this.questionsNode = config.questionsNode;
         this.listenAudioButton = config.listenAudioButton;
         this.pauseAudioButton = config.pauseAudioButton;
         this.items = config.items;
@@ -435,7 +473,9 @@ class EquipmentInfoGame {
         game.imageNode.alt = item.title;
         game.listenAudioButton.hidden = item.audio === "";
         game.pauseAudioButton.hidden = item.audio === "";
+        game.questionsPanelNode.hidden = false;
         EquipmentInfoGame.renderFacts(game.factsNode, item);
+        EquipmentInfoGame.renderQuestions(game.questionsNode, item);
     }
 
     static renderFacts(factsNode, item) {
@@ -450,6 +490,38 @@ class EquipmentInfoGame {
 
             factsNode.append(term, value);
         });
+    }
+
+    static renderQuestions(questionsNode, item) {
+        EquipmentInfoGame.clearNode(questionsNode);
+
+        EquipmentInfoGame.randomQuestions(item).forEach((question) => {
+            const questionNode = document.createElement("li");
+            questionNode.textContent = question;
+
+            questionsNode.append(questionNode);
+        });
+    }
+
+    static randomQuestions(item) {
+        return EquipmentInfoGame.shuffle(QUESTION_FIELDS.filter((field) => {
+            return item.details[field.key] !== "";
+        }))
+            .slice(0, QUESTION_COUNT)
+            .map((field) => field.question);
+    }
+
+    static shuffle(items) {
+        const shuffledItems = [...items];
+
+        for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+            const targetIndex = Math.floor(Math.random() * (index + 1));
+            const currentItem = shuffledItems[index];
+            shuffledItems[index] = shuffledItems[targetIndex];
+            shuffledItems[targetIndex] = currentItem;
+        }
+
+        return shuffledItems;
     }
 
     static setActiveCard(game, itemId) {
@@ -537,6 +609,8 @@ function main() {
         titleNode: document.querySelector("#equipment-title"),
         imageNode: document.querySelector("#equipment-image"),
         factsNode: document.querySelector("#equipment-facts"),
+        questionsPanelNode: document.querySelector("#equipment-questions-panel"),
+        questionsNode: document.querySelector("#equipment-questions"),
         listenAudioButton: document.querySelector("#listen-audio"),
         pauseAudioButton: document.querySelector("#pause-audio"),
         items: EQUIPMENT_ITEMS,
@@ -555,6 +629,8 @@ if (typeof module !== "undefined") {
         DETAIL_FIELDS,
         EQUIPMENT_ITEMS,
         EquipmentInfoGame,
+        QUESTION_COUNT,
+        QUESTION_FIELDS,
         VOICE_VOLUME,
         main,
     };

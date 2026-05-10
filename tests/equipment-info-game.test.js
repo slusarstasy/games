@@ -7,6 +7,8 @@ const {
     CATEGORY_NAMES,
     EQUIPMENT_ITEMS,
     EquipmentInfoGame,
+    QUESTION_COUNT,
+    QUESTION_FIELDS,
     VOICE_VOLUME,
 } = require("../equipment_info_game/game.js");
 const { SOUND_FILES } = require("../shared/game-sounds.js");
@@ -135,6 +137,8 @@ function buildGame() {
         titleNode: new FakeNode(),
         imageNode: new FakeNode(),
         factsNode: new FakeNode(),
+        questionsPanelNode: new FakeNode(),
+        questionsNode: new FakeNode(),
         listenAudioButton: new FakeNode(),
         pauseAudioButton: new FakeNode(),
         items: EQUIPMENT_ITEMS,
@@ -182,6 +186,7 @@ test("selectItem shows vehicle text for parent reading", () => {
         assert.equal(game.imageNode.alt, "Бульдозер");
         assert.equal(game.listenAudioButton.hidden, true);
         assert.equal(game.pauseAudioButton.hidden, true);
+        assert.equal(game.questionsPanelNode.hidden, false);
         assert.equal(game.factsNode.children[0].textContent, "Где работает:");
         assert.equal(game.factsNode.children[1].textContent, "На стройке.");
         assert.equal(game.factsNode.children[14].textContent, "Для чего нужен:");
@@ -189,6 +194,22 @@ test("selectItem shows vehicle text for parent reading", () => {
             game.factsNode.children[15].textContent,
             "Чтобы выравнивать землю.",
         );
+        assert.equal(game.questionsNode.children.length, QUESTION_COUNT);
+        game.questionsNode.children.forEach((questionNode) => {
+            assert.ok(QUESTION_FIELDS.some((field) => {
+                return field.question === questionNode.textContent;
+            }));
+        });
+    });
+});
+
+test("randomQuestions returns three topical questions without repeats", () => {
+    const questions = EquipmentInfoGame.randomQuestions(EQUIPMENT_ITEMS[0]);
+
+    assert.equal(questions.length, QUESTION_COUNT);
+    assert.equal(new Set(questions).size, QUESTION_COUNT);
+    questions.forEach((question) => {
+        assert.ok(QUESTION_FIELDS.some((field) => field.question === question));
     });
 });
 

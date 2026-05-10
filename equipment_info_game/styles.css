@@ -132,12 +132,17 @@
     text-align: center;
 }
 
-.equipment-reader {
+.equipment-side {
     position: sticky;
     top: 18px;
+    display: grid;
+    gap: 14px;
+    align-self: start;
     justify-self: end;
     width: min(100%, 540px);
-    min-height: min(760px, calc(100vh - 52px));
+}
+
+.equipment-reader {
     padding: clamp(18px, 2.5vw, 28px);
     background: var(--theme-panel);
 }
@@ -163,6 +168,7 @@
     gap: 14px;
 }
 
+.equipment-side [hidden],
 .equipment-details[hidden],
 .empty-state[hidden],
 .audio-button[hidden] {
@@ -301,6 +307,39 @@
     margin: 0;
 }
 
+.equipment-questions {
+    display: grid;
+    gap: 12px;
+    padding: 18px 20px 20px;
+    border-color: rgba(77, 131, 123, 0.24);
+    background: #fffaf2;
+}
+
+.equipment-questions h2 {
+    margin: 0;
+    color: var(--theme-heading);
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+}
+
+.equipment-questions ol {
+    display: grid;
+    gap: 9px;
+    margin: 0;
+    padding-left: 1.45rem;
+    color: var(--theme-ink);
+    font-size: clamp(1.08rem, 1.6vw, 1.24rem);
+    font-weight: 800;
+    line-height: 1.22;
+}
+
+.equipment-questions li::marker {
+    color: var(--theme-accent);
+    font-weight: 900;
+}
+
 @media (max-width: 1060px) {
     .equipment-cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -316,10 +355,13 @@
         grid-template-columns: 1fr;
     }
 
-    .equipment-reader {
+    .equipment-side {
         position: static;
         justify-self: stretch;
         width: 100%;
+    }
+
+    .equipment-reader {
         min-height: 0;
     }
 
