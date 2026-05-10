@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Знакомство с техникой</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="equipment-app page-shell">
+        <header class="top-bar">
+            <div class="title-group">
+                <a class="back-link theme-link" href="../index.html">
+                    <span class="theme-icon" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" focusable="false">
+                            <path d="M7.3 3 2.4 8l4.9 5 1.2-1.2L5.8 9H14V7H5.8l2.7-2.8L7.3 3Z"></path>
+                        </svg>
+                    </span>
+                    Все игры
+                </a>
+                <h1 class="theme-title">Знакомство с техникой</h1>
+            </div>
+        </header>
+
+        <section class="learning-board" aria-label="Знакомство со строительной техникой">
+            <section class="equipment-list" id="equipment-list" aria-label="Карточки техники"></section>
+
+            <aside class="equipment-reader theme-panel" aria-live="polite">
+                <div class="empty-state" id="empty-state">
+                    <p>Выбери машину</p>
+                </div>
+
+                <article class="equipment-details" id="equipment-details" hidden>
+                    <p class="eyebrow" id="equipment-category"></p>
+                    <h2 id="equipment-title"></h2>
+
+                    <div class="equipment-hero">
+                        <img id="equipment-image" src="" alt="">
+                    </div>
+
+                    <button class="theme-button audio-button" id="repeat-audio" type="button" hidden>
+                        Слушать ещё раз
+                    </button>
+
+                    <dl class="equipment-facts" id="equipment-facts"></dl>
+                </article>
+            </aside>
+        </section>
+    </main>
+
+    <script src="game.js"></script>
+</body>
+</html>
