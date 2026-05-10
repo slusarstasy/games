@@ -4,10 +4,10 @@ const SCORE_FLASH_ANIMATION_DURATION_MS = 120;
 const SCORE_FLIGHT_ANIMATION_DURATION_MS = 760;
 const SCORE_AWARD_ANIMATION_EASING = "cubic-bezier(0.2, 0.86, 0.32, 1)";
 const TRAY_EDGE_GAP_PX = 8;
-const TRAY_LEFT_JITTER_PERCENT = 5;
-const TRAY_TOP_OFFSET_PX = 4;
-const TRAY_TOP_ROW_OFFSET_PX = 18;
-const TRAY_TOP_JITTER_PX = 18;
+const TRAY_TOP_OFFSET_PX = 0;
+const TRAY_PIECE_HEIGHT_PX = 108;
+const TRAY_PIECE_MIN_WIDTH_PX = 36;
+const TRAY_PIECE_MAX_WIDTH_PX = 148;
 const START_MESSAGE = "Перетащи части в рамку. Клик по части поворачивает ее";
 const FINAL_MESSAGE = "Все пазлы собраны! Отличная работа!";
 const PRAISE_MESSAGES = [
@@ -408,7 +408,7 @@ class PuzzleGame {
 
     static renderPieces(game, puzzle) {
         const pieces = PuzzleGame.mixedTrayPieces(game.pieces);
-        const trayPositions = PuzzleGame.randomTrayPositions(pieces.length);
+        const trayPositions = PuzzleGame.topTrayPositions(pieces.length);
 
         pieces.forEach((piece, index) => {
             const pieceNode = PuzzleGame.createPieceNode(game, puzzle, piece);
@@ -460,23 +460,13 @@ class PuzzleGame {
         game.trayNode.dataset.parts = String(puzzle.rows * puzzle.columns);
     }
 
-    static randomTrayPositions(pieceCount) {
+    static topTrayPositions(pieceCount) {
         const traySlots = PuzzleGame.topTraySlots(pieceCount);
 
         return traySlots.map((traySlot) => {
-            const leftPercent = traySlot.leftPercent
-                + PuzzleGame.randomBetween(
-                    -TRAY_LEFT_JITTER_PERCENT,
-                    TRAY_LEFT_JITTER_PERCENT,
-                );
-            const topPx = traySlot.topPx + PuzzleGame.randomBetween(
-                0,
-                TRAY_TOP_JITTER_PX,
-            );
-
             return {
-                left: PuzzleGame.trayLeftStyleValue(leftPercent),
-                top: `${Math.round(topPx)}px`,
+                left: PuzzleGame.trayLeftStyleValue(traySlot.leftPercent),
+                top: `${traySlot.topPx}px`,
             };
         });
     }
@@ -488,16 +478,11 @@ class PuzzleGame {
         for (let index = 0; index < pieceCount; index += 1) {
             traySlots.push({
                 leftPercent: leftStep * (index + 1),
-                topPx: TRAY_TOP_OFFSET_PX
-                    + (index % 2) * TRAY_TOP_ROW_OFFSET_PX,
+                topPx: TRAY_TOP_OFFSET_PX,
             });
         }
 
         return traySlots;
-    }
-
-    static randomBetween(minValue, maxValue) {
-        return minValue + Math.random() * (maxValue - minValue);
     }
 
     static trayLeftStyleValue(leftPercent) {
@@ -569,9 +554,12 @@ class PuzzleGame {
         const pieceWidth = piece.width / piece.columns;
         const pieceHeight = piece.height / piece.rows;
         const aspectRatio = pieceWidth / pieceHeight;
-        const width = aspectRatio * 160;
+        const width = aspectRatio * TRAY_PIECE_HEIGHT_PX;
 
-        return Math.round(Math.min(190, Math.max(96, width)));
+        return Math.round(Math.min(
+            TRAY_PIECE_MAX_WIDTH_PX,
+            Math.max(TRAY_PIECE_MIN_WIDTH_PX, width),
+        ));
     }
 
     static handlePieceClick(game, pieceId, event) {

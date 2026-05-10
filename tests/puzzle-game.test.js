@@ -247,8 +247,8 @@ test("mixedTrayPieces does not leave pieces above matching slots", () => {
     });
 });
 
-test("randomTrayPositions keeps starting pieces in the top tray area", () => {
-    const positions = PuzzleGame.randomTrayPositions(4);
+test("topTrayPositions keeps starting pieces in a straight top row", () => {
+    const positions = PuzzleGame.topTrayPositions(4);
 
     assert.equal(positions.length, 4);
 
@@ -257,8 +257,7 @@ test("randomTrayPositions keeps starting pieces in the top tray area", () => {
 
         assert.match(position.left, /^clamp\(8px, \d+(\.\d+)?%, /);
         assert.match(position.top, /^\d+px$/);
-        assert.ok(topPx >= 4);
-        assert.ok(topPx <= 40);
+        assert.equal(topPx, 0);
         assert.equal(Object.hasOwn(position, "right"), false);
         assert.equal(Object.hasOwn(position, "bottom"), false);
     });

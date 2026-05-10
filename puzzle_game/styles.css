@@ -60,7 +60,7 @@
 
 .puzzle-board {
     display: grid;
-    gap: 16px;
+    gap: 10px;
     padding: clamp(14px, 2vw, 22px);
 }
 
@@ -86,12 +86,13 @@
 .puzzle-workspace {
     position: relative;
     display: grid;
-    gap: clamp(16px, 3vw, 34px);
-    align-items: center;
+    grid-template-rows: clamp(112px, 13vh, 122px) minmax(0, 1fr);
+    gap: clamp(8px, 1vw, 10px);
+    align-items: start;
     justify-items: center;
     min-height: clamp(520px, 72vh, 760px);
     padding:
-        clamp(96px, 11vw, 130px)
+        clamp(4px, 1vw, 10px)
         clamp(72px, 9vw, 132px)
         clamp(22px, 4vw, 56px);
 }
@@ -99,6 +100,7 @@
 .puzzle-target-wrap {
     position: relative;
     z-index: 1;
+    grid-row: 2;
     display: grid;
     place-items: center;
     width: min(100%, 780px);
@@ -173,11 +175,12 @@
 }
 
 .pieces-tray {
-    position: absolute;
-    inset: 0;
+    position: relative;
     z-index: 2;
+    grid-row: 1;
     width: 100%;
-    min-height: 0;
+    height: 100%;
+    min-height: 112px;
     pointer-events: none;
 }
 
@@ -306,11 +309,14 @@
         gap: 10px;
         justify-items: center;
         width: 100%;
+        height: auto;
         min-height: 0;
         pointer-events: auto;
     }
 
     .puzzle-workspace {
+        grid-template-rows: auto auto;
+        gap: 14px;
         min-height: 0;
         padding: 0;
     }
