@@ -3,6 +3,11 @@ const POINTER_DRAG_THRESHOLD = 8;
 const SCORE_FLASH_ANIMATION_DURATION_MS = 120;
 const SCORE_FLIGHT_ANIMATION_DURATION_MS = 760;
 const SCORE_AWARD_ANIMATION_EASING = "cubic-bezier(0.2, 0.86, 0.32, 1)";
+const TRAY_EDGE_GAP_PX = 8;
+const TRAY_LEFT_JITTER_PERCENT = 5;
+const TRAY_TOP_OFFSET_PX = 4;
+const TRAY_TOP_ROW_OFFSET_PX = 18;
+const TRAY_TOP_JITTER_PX = 18;
 const START_MESSAGE = "Перетащи части в рамку. Клик по части поворачивает ее";
 const FINAL_MESSAGE = "Все пазлы собраны! Отличная работа!";
 const PRAISE_MESSAGES = [
@@ -21,16 +26,13 @@ const GameSounds = (() => {
     return window.GameSounds;
 })();
 
-const PUZZLES = [
+const PUZZLE_IMAGES = [
     {
         id: "tower-crane",
         title: "Башенный кран",
         image: "../data/images/башенный_кран.png",
         width: 568,
         height: 742,
-        rows: 1,
-        columns: 2,
-        rotationsEnabled: false,
     },
     {
         id: "auto-crane",
@@ -38,9 +40,6 @@ const PUZZLES = [
         image: "../data/images/автокран.png",
         width: 761,
         height: 607,
-        rows: 1,
-        columns: 2,
-        rotationsEnabled: true,
     },
     {
         id: "lift",
@@ -48,9 +47,6 @@ const PUZZLES = [
         image: "../data/images/подъёмник.png",
         width: 475,
         height: 703,
-        rows: 2,
-        columns: 1,
-        rotationsEnabled: true,
     },
     {
         id: "concrete-pump",
@@ -58,9 +54,6 @@ const PUZZLES = [
         image: "../data/images/бетононасос.png",
         width: 646,
         height: 708,
-        rows: 2,
-        columns: 2,
-        rotationsEnabled: true,
     },
     {
         id: "concrete-mixer",
@@ -68,9 +61,6 @@ const PUZZLES = [
         image: "../data/images/бетономешалка.png",
         width: 756,
         height: 520,
-        rows: 2,
-        columns: 2,
-        rotationsEnabled: true,
     },
     {
         id: "roller",
@@ -78,11 +68,123 @@ const PUZZLES = [
         image: "../data/images/каток.png",
         width: 755,
         height: 578,
+    },
+    {
+        id: "front-loader",
+        title: "Фронтальный погрузчик",
+        image: "../data/images/фронтальный_погрузчик.png",
+        width: 747,
+        height: 528,
+    },
+    {
+        id: "excavator",
+        title: "Экскаватор",
+        image: "../data/images/экскаватор.png",
+        width: 744,
+        height: 654,
+    },
+    {
+        id: "asphalt-paver",
+        title: "Асфальтоукладчик",
+        image: "../data/images/асфальтоукладчик.png",
+        width: 730,
+        height: 590,
+    },
+    {
+        id: "shift-bus",
+        title: "Вахтовый автобус",
+        image: "../data/images/вахтовый_автобус.png",
+        width: 761,
+        height: 451,
+    },
+    {
+        id: "dump-truck",
+        title: "Самосвал",
+        image: "../data/images/самосвал.png",
+        width: 779,
+        height: 542,
+    },
+    {
+        id: "bulldozer",
+        title: "Бульдозер",
+        image: "../data/images/бульдозер.png",
+        width: 750,
+        height: 532,
+    },
+    {
+        id: "microbus",
+        title: "Микроавтобус",
+        image: "../data/images/микроавтобус.png",
+        width: 742,
+        height: 460,
+    },
+    {
+        id: "truck",
+        title: "Грузовик",
+        image: "../data/images/грузовик.png",
+        width: 754,
+        height: 483,
+    },
+    {
+        id: "mortar-pump",
+        title: "Растворонасос",
+        image: "../data/images/растворонасос.png",
+        width: 740,
+        height: 455,
+    },
+];
+
+const PUZZLE_LAYOUTS = [
+    {
+        rows: 1,
+        columns: 2,
+        rotationsEnabled: false,
+    },
+    {
+        rows: 1,
+        columns: 2,
+        rotationsEnabled: true,
+    },
+    {
+        rows: 2,
+        columns: 1,
+        rotationsEnabled: true,
+    },
+    {
+        rows: 2,
+        columns: 2,
+        rotationsEnabled: true,
+    },
+    {
+        rows: 2,
+        columns: 2,
+        rotationsEnabled: true,
+    },
+    {
         rows: 2,
         columns: 2,
         rotationsEnabled: true,
     },
 ];
+
+const PUZZLES = buildPuzzleDefinitions(PUZZLE_IMAGES, PUZZLE_LAYOUTS);
+
+function buildPuzzleDefinitions(puzzleImages, puzzleLayouts) {
+    return puzzleLayouts.map((layout, index) => {
+        const puzzleImage = puzzleImages[index];
+
+        return {
+            id: puzzleImage.id,
+            title: puzzleImage.title,
+            image: puzzleImage.image,
+            width: puzzleImage.width,
+            height: puzzleImage.height,
+            rows: layout.rows,
+            columns: layout.columns,
+            rotationsEnabled: layout.rotationsEnabled,
+        };
+    });
+}
 
 class PuzzleGame {
     constructor(config) {
@@ -94,7 +196,10 @@ class PuzzleGame {
         this.statusPanel = config.statusPanel;
         this.puzzleTitleNode = config.puzzleTitleNode;
         this.progressNode = config.progressNode;
-        this.puzzles = config.puzzles;
+        this.puzzles = PuzzleGame.buildPuzzleSequence(
+            config.puzzleImages,
+            config.puzzleLayouts,
+        );
         this.currentPuzzleIndex = 0;
         this.score = 0;
         this.pieces = [];
@@ -133,6 +238,28 @@ class PuzzleGame {
         return game.puzzles[game.currentPuzzleIndex];
     }
 
+    static buildPuzzleSequence(puzzleImages, puzzleLayouts) {
+        const shuffledImages = PuzzleGame.shuffle(puzzleImages).slice(
+            0,
+            puzzleLayouts.length,
+        );
+
+        return buildPuzzleDefinitions(shuffledImages, puzzleLayouts);
+    }
+
+    static shuffle(items) {
+        const shuffledItems = [...items];
+
+        for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+            const targetIndex = Math.floor(Math.random() * (index + 1));
+            const currentItem = shuffledItems[index];
+            shuffledItems[index] = shuffledItems[targetIndex];
+            shuffledItems[targetIndex] = currentItem;
+        }
+
+        return shuffledItems;
+    }
+
     static buildPieces(puzzle) {
         const pieces = [];
 
@@ -147,6 +274,7 @@ class PuzzleGame {
                 pieces.push({
                     id: `${puzzle.id}-${slotId}`,
                     puzzleId: puzzle.id,
+                    slotIndex: index,
                     title: puzzle.title,
                     image: puzzle.image,
                     width: puzzle.width,
@@ -279,16 +407,111 @@ class PuzzleGame {
     }
 
     static renderPieces(game, puzzle) {
-        game.pieces.forEach((piece, index) => {
+        const pieces = PuzzleGame.mixedTrayPieces(game.pieces);
+        const trayPositions = PuzzleGame.randomTrayPositions(pieces.length);
+
+        pieces.forEach((piece, index) => {
             const pieceNode = PuzzleGame.createPieceNode(game, puzzle, piece);
             pieceNode.dataset.pieceIndex = String(index);
+            PuzzleGame.applyTrayPosition(pieceNode, trayPositions[index]);
             game.pieceNodes.set(piece.id, pieceNode);
             game.trayNode.append(pieceNode);
         });
     }
 
+    static mixedTrayPieces(pieces) {
+        const shuffledPieces = PuzzleGame.shuffle(pieces);
+
+        if (PuzzleGame.hasNoMatchingTraySlots(shuffledPieces)) {
+            return shuffledPieces;
+        }
+
+        return PuzzleGame.rotatePieces(
+            pieces,
+            PuzzleGame.randomTrayOffset(pieces.length),
+        );
+    }
+
+    static hasNoMatchingTraySlots(pieces) {
+        return pieces.every((piece, index) => piece.slotIndex !== index);
+    }
+
+    static rotatePieces(pieces, offset) {
+        if (pieces.length === 0) {
+            return [];
+        }
+
+        return pieces.map((piece, index) => {
+            const sourceIndex = (index + offset) % pieces.length;
+
+            return pieces[sourceIndex];
+        });
+    }
+
+    static randomTrayOffset(pieceCount) {
+        if (pieceCount < 2) {
+            return 0;
+        }
+
+        return 1 + Math.floor(Math.random() * (pieceCount - 1));
+    }
+
     static updateTrayLayout(game, puzzle) {
         game.trayNode.dataset.parts = String(puzzle.rows * puzzle.columns);
+    }
+
+    static randomTrayPositions(pieceCount) {
+        const traySlots = PuzzleGame.topTraySlots(pieceCount);
+
+        return traySlots.map((traySlot) => {
+            const leftPercent = traySlot.leftPercent
+                + PuzzleGame.randomBetween(
+                    -TRAY_LEFT_JITTER_PERCENT,
+                    TRAY_LEFT_JITTER_PERCENT,
+                );
+            const topPx = traySlot.topPx + PuzzleGame.randomBetween(
+                0,
+                TRAY_TOP_JITTER_PX,
+            );
+
+            return {
+                left: PuzzleGame.trayLeftStyleValue(leftPercent),
+                top: `${Math.round(topPx)}px`,
+            };
+        });
+    }
+
+    static topTraySlots(pieceCount) {
+        const traySlots = [];
+        const leftStep = 100 / (pieceCount + 1);
+
+        for (let index = 0; index < pieceCount; index += 1) {
+            traySlots.push({
+                leftPercent: leftStep * (index + 1),
+                topPx: TRAY_TOP_OFFSET_PX
+                    + (index % 2) * TRAY_TOP_ROW_OFFSET_PX,
+            });
+        }
+
+        return traySlots;
+    }
+
+    static randomBetween(minValue, maxValue) {
+        return minValue + Math.random() * (maxValue - minValue);
+    }
+
+    static trayLeftStyleValue(leftPercent) {
+        const clampedLeftPercent = Math.min(84, Math.max(4, leftPercent));
+        const formattedLeftPercent = Number(clampedLeftPercent.toFixed(2));
+
+        return `clamp(${TRAY_EDGE_GAP_PX}px, ${formattedLeftPercent}%, `
+            + `calc(100% - min(var(--piece-tray-width), 18vw) - `
+            + `${TRAY_EDGE_GAP_PX}px))`;
+    }
+
+    static applyTrayPosition(pieceNode, trayPosition) {
+        pieceNode.style.setProperty("--piece-tray-left", trayPosition.left);
+        pieceNode.style.setProperty("--piece-tray-top", trayPosition.top);
     }
 
     static createPieceNode(game, puzzle, piece) {
@@ -453,15 +676,37 @@ class PuzzleGame {
 
     static createPiecePlaceholder(pieceNode) {
         const placeholder = document.createElement("span");
-        const trayWidth = typeof pieceNode.style.getPropertyValue === "function"
-            ? pieceNode.style.getPropertyValue("--piece-tray-width")
-            : "";
         placeholder.className = "puzzle-piece-placeholder";
         placeholder.dataset.pieceIndex = pieceNode.dataset.pieceIndex;
         placeholder.style.aspectRatio = pieceNode.style.aspectRatio;
-        placeholder.style.setProperty("--piece-tray-width", trayWidth);
+        PuzzleGame.copyStyleProperty(
+            pieceNode,
+            placeholder,
+            "--piece-tray-width",
+        );
+        PuzzleGame.copyStyleProperty(
+            pieceNode,
+            placeholder,
+            "--piece-tray-left",
+        );
+        PuzzleGame.copyStyleProperty(
+            pieceNode,
+            placeholder,
+            "--piece-tray-top",
+        );
 
         return placeholder;
+    }
+
+    static copyStyleProperty(sourceNode, targetNode, propertyName) {
+        if (typeof sourceNode.style.getPropertyValue !== "function") {
+            return;
+        }
+
+        targetNode.style.setProperty(
+            propertyName,
+            sourceNode.style.getPropertyValue(propertyName),
+        );
     }
 
     static placeDragPlaceholder(drag) {
@@ -846,7 +1091,8 @@ function main() {
         statusPanel: document.querySelector(".status-panel"),
         puzzleTitleNode: document.querySelector("#puzzle-title"),
         progressNode: document.querySelector("#puzzle-progress"),
-        puzzles: PUZZLES,
+        puzzleImages: PUZZLE_IMAGES,
+        puzzleLayouts: PUZZLE_LAYOUTS,
     });
 
     game.start();
@@ -860,6 +1106,8 @@ if (typeof module !== "undefined") {
     module.exports = {
         FINAL_MESSAGE,
         PRAISE_MESSAGES,
+        PUZZLE_IMAGES,
+        PUZZLE_LAYOUTS,
         PUZZLES,
         PuzzleGame,
         START_MESSAGE,

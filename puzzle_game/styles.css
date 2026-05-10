@@ -279,6 +279,8 @@
 
 .pieces-tray .puzzle-piece {
     position: absolute;
+    top: var(--piece-tray-top);
+    left: var(--piece-tray-left);
     width: min(var(--piece-tray-width), 18vw);
     pointer-events: auto;
 }
@@ -293,42 +295,8 @@
 
 .pieces-tray .puzzle-piece-placeholder {
     position: absolute;
-}
-
-.pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="0"],
-.pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="0"] {
-    top: 8px;
-    left: clamp(10px, 7vw, 92px);
-}
-
-.pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="1"],
-.pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="1"] {
-    top: 14px;
-    right: clamp(10px, 7vw, 92px);
-}
-
-.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="0"],
-.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="0"] {
-    top: 4px;
-    left: clamp(8px, 5vw, 74px);
-}
-
-.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="1"],
-.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="1"] {
-    top: 12px;
-    right: clamp(8px, 5vw, 74px);
-}
-
-.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="2"],
-.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="2"] {
-    bottom: clamp(16px, 8vh, 78px);
-    left: clamp(6px, 4vw, 54px);
-}
-
-.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="3"],
-.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="3"] {
-    right: clamp(6px, 4vw, 54px);
-    bottom: clamp(16px, 8vh, 78px);
+    top: var(--piece-tray-top);
+    left: var(--piece-tray-left);
 }
 
 .puzzle-slot .puzzle-piece {
@@ -441,23 +409,9 @@
     }
 
     .pieces-tray .puzzle-piece,
-    .pieces-tray .puzzle-piece-placeholder,
-    .pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="0"],
-    .pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="0"],
-    .pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="1"],
-    .pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="1"],
-    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="0"],
-    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="0"],
-    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="1"],
-    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="1"],
-    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="2"],
-    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="2"],
-    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="3"],
-    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="3"] {
+    .pieces-tray .puzzle-piece-placeholder {
         position: relative;
         top: auto;
-        right: auto;
-        bottom: auto;
         left: auto;
         width: min(var(--piece-tray-width), 42vw);
     }

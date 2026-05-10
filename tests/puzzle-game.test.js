@@ -5,6 +5,8 @@ const path = require("node:path");
 
 const {
     FINAL_MESSAGE,
+    PUZZLE_IMAGES,
+    PUZZLE_LAYOUTS,
     PUZZLES,
     PuzzleGame,
 } = require("../puzzle_game/game.js");
@@ -101,6 +103,8 @@ class FakePieceNode {
         this.style = new FakeStyle();
         this.style.aspectRatio = "1 / 1";
         this.style.setProperty("--piece-tray-width", "120px");
+        this.style.setProperty("--piece-tray-left", "24%");
+        this.style.setProperty("--piece-tray-top", "12px");
     }
 
     getBoundingClientRect() {
@@ -143,12 +147,58 @@ function withFakeDocument(callback) {
 test("puzzle image assets exist", () => {
     const gameDirectory = path.join(__dirname, "..", "puzzle_game");
 
-    PUZZLES.forEach((puzzle) => {
-        const imagePath = path.resolve(gameDirectory, puzzle.image);
+    PUZZLE_IMAGES.forEach((puzzleImage) => {
+        const imagePath = path.resolve(gameDirectory, puzzleImage.image);
 
-        assert.equal(puzzle.image, puzzle.image.normalize("NFC"));
-        assert.equal(fs.existsSync(imagePath), true, puzzle.image);
+        assert.equal(puzzleImage.image, puzzleImage.image.normalize("NFC"));
+        assert.equal(fs.existsSync(imagePath), true, puzzleImage.image);
     });
+});
+
+test("buildPuzzleSequence picks shuffled images for fixed puzzle layouts", () => {
+    const originalRandom = Math.random;
+    const puzzleImages = [
+        {
+            id: "first",
+            title: "Первая",
+            image: "../data/images/автокран.png",
+            width: 761,
+            height: 607,
+        },
+        {
+            id: "second",
+            title: "Вторая",
+            image: "../data/images/каток.png",
+            width: 755,
+            height: 578,
+        },
+        {
+            id: "third",
+            title: "Третья",
+            image: "../data/images/самосвал.png",
+            width: 779,
+            height: 542,
+        },
+    ];
+    const puzzleLayouts = PUZZLE_LAYOUTS.slice(0, 2);
+    let puzzleSequence;
+
+    Math.random = () => 0;
+
+    try {
+        puzzleSequence = PuzzleGame.buildPuzzleSequence(puzzleImages, puzzleLayouts);
+    } finally {
+        Math.random = originalRandom;
+    }
+
+    assert.deepEqual(puzzleImages.map((puzzleImage) => puzzleImage.id), [
+        "first",
+        "second",
+        "third",
+    ]);
+    assert.deepEqual(puzzleSequence.map((puzzle) => puzzle.id), ["second", "third"]);
+    assert.deepEqual(puzzleSequence.map((puzzle) => puzzle.rows), [1, 1]);
+    assert.deepEqual(puzzleSequence.map((puzzle) => puzzle.columns), [2, 2]);
 });
 
 test("buildPieces creates two straight vertical parts without rotations", () => {
@@ -156,6 +206,7 @@ test("buildPieces creates two straight vertical parts without rotations", () => 
 
     assert.equal(pieces.length, 2);
     assert.deepEqual(pieces.map((piece) => piece.slotId), ["0-0", "0-1"]);
+    assert.deepEqual(pieces.map((piece) => piece.slotIndex), [0, 1]);
     assert.deepEqual(pieces.map((piece) => piece.initialRotation), [0, 0]);
     assert.equal(PuzzleGame.backgroundPosition(pieces[0]), "0% 0%");
     assert.equal(PuzzleGame.backgroundPosition(pieces[1]), "100% 0%");
@@ -174,6 +225,43 @@ test("buildPieces creates four straight grid parts with rotations", () => {
         [90, 270, 180, 90],
     );
     assert.equal(PuzzleGame.backgroundPosition(pieces[3]), "100% 100%");
+});
+
+test("mixedTrayPieces does not leave pieces above matching slots", () => {
+    const originalRandom = Math.random;
+    const pieces = PuzzleGame.buildPieces(PUZZLES[3]);
+    let mixedPieces;
+
+    Math.random = () => 0.999;
+
+    try {
+        mixedPieces = PuzzleGame.mixedTrayPieces(pieces);
+    } finally {
+        Math.random = originalRandom;
+    }
+
+    assert.deepEqual(pieces.map((piece) => piece.slotIndex), [0, 1, 2, 3]);
+    assert.equal(mixedPieces.length, pieces.length);
+    mixedPieces.forEach((piece, index) => {
+        assert.notEqual(piece.slotIndex, index);
+    });
+});
+
+test("randomTrayPositions keeps starting pieces in the top tray area", () => {
+    const positions = PuzzleGame.randomTrayPositions(4);
+
+    assert.equal(positions.length, 4);
+
+    positions.forEach((position) => {
+        const topPx = Number.parseInt(position.top, 10);
+
+        assert.match(position.left, /^clamp\(8px, \d+(\.\d+)?%, /);
+        assert.match(position.top, /^\d+px$/);
+        assert.ok(topPx >= 4);
+        assert.ok(topPx <= 40);
+        assert.equal(Object.hasOwn(position, "right"), false);
+        assert.equal(Object.hasOwn(position, "bottom"), false);
+    });
 });
 
 test("rotatePieceState turns a part by ninety degrees", () => {
@@ -219,6 +307,14 @@ test("pointer drag starts from document movement", () => {
         assert.equal(pieceNode.parentNode.children.length, 1);
         assert.equal(pieceNode.parentNode.children[0].className, "puzzle-piece-placeholder");
         assert.equal(pieceNode.parentNode.children[0].dataset.pieceIndex, "0");
+        assert.equal(
+            pieceNode.parentNode.children[0].style.getPropertyValue("--piece-tray-left"),
+            "24%",
+        );
+        assert.equal(
+            pieceNode.parentNode.children[0].style.getPropertyValue("--piece-tray-top"),
+            "12px",
+        );
 
         PuzzleGame.removePointerDragListeners(game.pointerDrag);
         assert.equal(fakeDocument.listeners.size, 0);
