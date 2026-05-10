@@ -1,7 +1,7 @@
 const POINTER_DRAG_THRESHOLD = 8;
-const START_MESSAGE = "Посмотри на ряды. Подумай, кто следующий, перетащи";
+const START_MESSAGE = "Посмотри на ряды. Подумай, кто следующий, и перетащи ответ";
 const RETRY_MESSAGE = "Попробуй еще раз";
-const FINAL_MESSAGE = "Ура! Все ряды собраны!";
+const FINAL_MESSAGE = "Ура! Все ряды продолжены!";
 const PRAISE_MESSAGES = [
     "Отлично!",
     "Получилось!",

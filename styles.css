@@ -178,49 +178,55 @@
     pointer-events: none;
 }
 
-.preview-rows-sheet {
+.preview-pattern-stage {
     position: relative;
     z-index: 1;
     display: grid;
-    gap: 9px;
-    width: min(88%, 250px);
-    padding: 18px 14px;
-    border: 3px solid #e2b895;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.96);
+    width: min(96%, 306px);
+    padding: 24px 18px;
+    border: 3px solid rgba(77, 131, 123, 0.24);
+    border-radius: var(--theme-radius-small);
+    background: rgba(255, 250, 242, 0.97);
     box-shadow:
         0 8px 0 rgba(160, 111, 70, 0.08),
-        0 12px 18px rgba(96, 70, 46, 0.1);
-    transform: rotate(-2deg);
+        0 15px 24px rgba(96, 70, 46, 0.13);
+    transform: rotate(-3deg);
 }
 
-.preview-row-line {
-    display: grid;
-    grid-template-columns: 1fr 1fr 34px 42px;
-    align-items: center;
-    gap: 6px;
-    min-height: 44px;
-}
-
-.preview-row-line img {
-    width: 100%;
-    max-height: 38px;
-    filter: drop-shadow(0 5px 5px rgba(96, 70, 46, 0.12));
-}
-
-.preview-row-slot,
-.preview-row-answer {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1;
-    border: 2px solid #efc8ad;
-    border-radius: 5px;
+.preview-pattern-stage::before {
+    position: absolute;
+    inset: 12px;
+    z-index: -1;
+    content: "";
+    border-radius: calc(var(--theme-radius-small) - 6px);
     background: #ffffff;
 }
 
-.preview-row-answer img {
-    width: 90%;
-    max-height: 32px;
+.preview-pattern-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+    gap: 7px;
+    min-height: 72px;
+}
+
+.preview-pattern-row img {
+    width: 100%;
+    max-height: 62px;
+    filter: drop-shadow(0 5px 5px rgba(96, 70, 46, 0.12));
+}
+
+.preview-next-slot {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border: 3px dashed rgba(212, 84, 23, 0.42);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.preview-next-slot {
+    box-shadow: inset 0 0 0 6px rgba(255, 250, 242, 0.76);
 }
 
 .game-info {
