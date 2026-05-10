@@ -247,6 +247,16 @@
     transition: color 160ms ease;
 }
 
+.game-title-info {
+    display: block;
+    max-width: none;
+}
+
+.game-title-nowrap {
+    display: inline-block;
+    white-space: nowrap;
+}
+
 .game-action {
     align-self: flex-start;
     margin-top: 4px;
