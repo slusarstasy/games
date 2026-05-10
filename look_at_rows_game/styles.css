@@ -6,45 +6,57 @@
     max-width: 860px;
 }
 
-.rows-board {
-    display: grid;
-    gap: clamp(14px, 2vw, 24px);
-    padding:
-        clamp(22px, 3vw, 38px)
-        clamp(14px, 3vw, 34px)
-        clamp(24px, 3.4vw, 40px);
-    border-color: #e2b895;
-    border-width: 4px;
-    border-radius: clamp(34px, 5.4vw, 74px);
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 5px 0 rgba(160, 111, 70, 0.16);
-    overflow-x: auto;
+.status-panel p {
+    max-width: 920px;
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    line-height: 1.12;
+    text-wrap: balance;
 }
 
-.rows-instruction {
-    margin: 0;
-    color: #9b6337;
-    font-size: clamp(1.25rem, 2.35vw, 2rem);
-    font-weight: 900;
-    line-height: 1.08;
-    text-align: center;
+.status-panel.is-success {
+    border-color: rgba(94, 148, 63, 0.28);
+    background: #f3f8df;
 }
 
-.rows-instruction.is-success {
+.status-panel.is-success p {
     color: var(--theme-success);
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    line-height: 1.05;
 }
 
-.rows-instruction.is-wrong {
-    color: var(--theme-accent);
+.status-panel.is-wrong {
+    border-color: rgba(212, 84, 23, 0.28);
+    background: #fff0e5;
 }
 
-.rows-instruction.is-finished {
+.status-panel.is-wrong p {
+    font-size: clamp(1.65rem, 3.6vw, 2.75rem);
+    line-height: 1.05;
+}
+
+.status-panel.is-finished {
+    border-color: rgba(77, 131, 123, 0.32);
+    background: #eaf5ef;
+}
+
+.status-panel.is-finished p {
     color: var(--theme-heading);
+    font-size: clamp(1.7rem, 3.8vw, 2.9rem);
+    line-height: 1.05;
+}
+
+.rows-board {
+    --rows-card-size: clamp(86px, 9.4vw, 116px);
+    --rows-vehicle-height: clamp(76px, 8.4vw, 104px);
+
+    display: grid;
+    padding: clamp(12px, 1.6vw, 18px);
+    overflow-x: auto;
 }
 
 .rows-workspace {
     display: grid;
-    gap: clamp(10px, 1.25vw, 16px);
+    gap: 9px;
     min-width: 790px;
 }
 
@@ -52,12 +64,17 @@
     display: grid;
     grid-template-columns:
         minmax(430px, 1fr)
-        clamp(92px, 10vw, 120px)
+        var(--rows-card-size)
         clamp(58px, 7vw, 82px)
-        clamp(92px, 10vw, 120px);
+        var(--rows-card-size);
     align-items: center;
     gap: clamp(8px, 1vw, 14px);
-    min-height: clamp(88px, 10vw, 122px);
+    min-height: var(--rows-card-size);
+    padding: 7px;
+    border: 2px solid rgba(160, 111, 70, 0.13);
+    border-radius: var(--theme-radius-small);
+    background: rgba(255, 250, 242, 0.54);
+    box-shadow: 0 4px 0 rgba(160, 111, 70, 0.12);
 }
 
 .row-pattern {
@@ -78,7 +95,7 @@
 
 .row-vehicle {
     min-width: 0;
-    min-height: clamp(82px, 9vw, 112px);
+    min-height: var(--rows-vehicle-height);
 }
 
 .row-vehicle img,
@@ -91,13 +108,13 @@
 
 .row-vehicle img {
     width: 100%;
-    max-height: clamp(78px, 8.6vw, 108px);
-    filter: drop-shadow(0 8px 7px rgba(96, 70, 46, 0.14));
+    max-height: var(--rows-vehicle-height);
+    filter: drop-shadow(0 9px 10px rgba(96, 70, 46, 0.16));
 }
 
 .row-vehicle[data-vehicle-id="tower-crane"] img,
 .row-vehicle[data-vehicle-id="lift"] img {
-    max-height: clamp(92px, 10.5vw, 126px);
+    max-height: calc(var(--rows-vehicle-height) + 18px);
 }
 
 .row-vehicle[data-vehicle-id="tower-crane"] img {
@@ -107,16 +124,16 @@
 .answer-slot,
 .answer-card,
 .answer-card-placeholder {
-    width: clamp(88px, 9.6vw, 116px);
+    width: var(--rows-card-size);
     aspect-ratio: 1;
-    border: 2px solid #efc8ad;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid rgba(160, 111, 70, 0.13);
+    border-radius: var(--theme-radius-small);
+    background: rgba(255, 250, 242, 0.92);
 }
 
 .answer-slot {
     position: relative;
-    box-shadow: inset 0 0 0 3px rgba(255, 250, 242, 0.86);
+    box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.46);
 }
 
 .answer-slot.is-complete {
@@ -136,44 +153,43 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #a66a39;
+    background: var(--theme-line);
 }
 
 .answer-home {
     min-width: 0;
-    min-height: clamp(88px, 10vw, 120px);
+    min-height: var(--rows-card-size);
 }
 
 .answer-card {
-    padding: 8px;
+    padding: 7px;
+    box-shadow: 0 4px 0 rgba(160, 111, 70, 0.16);
     cursor: grab;
-    filter: drop-shadow(0 8px 9px rgba(96, 70, 46, 0.13));
+    filter: none;
     touch-action: none;
     transition:
+        background 160ms ease,
         border-color 160ms ease,
         box-shadow 160ms ease,
-        filter 160ms ease,
         transform 160ms ease;
 }
 
 .answer-card img {
     width: 100%;
-    max-height: 94px;
+    max-height: calc(var(--rows-card-size) - 18px);
+    filter: drop-shadow(0 9px 10px rgba(96, 70, 46, 0.16));
 }
 
 .answer-card[data-vehicle-id="tower-crane"] img {
     width: 72%;
-    max-height: 104px;
+    max-height: calc(var(--rows-card-size) - 10px);
 }
 
 .answer-card:hover,
 .answer-card:focus-visible {
-    border-color: var(--theme-accent);
-    outline: none;
+    border-color: rgba(212, 84, 23, 0.46);
     box-shadow: var(--theme-focus);
-    filter:
-        drop-shadow(0 10px 10px rgba(96, 70, 46, 0.18))
-        drop-shadow(0 0 8px rgba(212, 84, 23, 0.22));
+    outline: none;
     transform: translateY(-2px);
 }
 
@@ -184,18 +200,18 @@
 
 .answer-card.is-dragging {
     z-index: 30;
-    filter:
-        drop-shadow(0 16px 18px rgba(96, 70, 46, 0.28))
-        drop-shadow(0 0 12px rgba(212, 84, 23, 0.18));
+    box-shadow:
+        0 12px 0 rgba(160, 111, 70, 0.12),
+        0 18px 22px rgba(96, 70, 46, 0.24);
     transition: none;
     transform: none;
 }
 
 .answer-card.is-complete {
     border-color: rgba(94, 148, 63, 0.62);
+    background: #f2f8df;
     box-shadow: none;
     cursor: default;
-    filter: none;
     transform: none;
 }
 
@@ -210,10 +226,6 @@
 @media (max-width: 820px) {
     .rows-app {
         width: min(100% - 20px, 680px);
-    }
-
-    .rows-board {
-        border-radius: 34px;
     }
 
     .rows-workspace {
@@ -232,14 +244,10 @@
 
 @media (max-width: 520px) {
     .rows-board {
-        padding: 20px 12px 24px;
+        padding: 12px;
     }
 
     .rows-workspace {
         min-width: 680px;
-    }
-
-    .rows-instruction {
-        text-align: left;
     }
 }

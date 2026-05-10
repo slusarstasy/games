@@ -108,12 +108,13 @@ function buildGame() {
         answerCards: new Map(),
         answerHomeNodes: new Map(),
         completedRows: new Set(),
-        messageNode: new FakeNode(["rows-instruction"]),
+        messageNode: new FakeNode([]),
         rows: ROW_PATTERNS,
         score: 0,
         scoreNode: new FakeNode([]),
         scorePanel: new FakeNode(["score"]),
         slotNodes: new Map(),
+        statusPanel: new FakeNode(["status-panel"]),
     };
 
     ANSWER_ITEMS.forEach((vehicleId) => {
@@ -229,7 +230,7 @@ test("correct answer fills a slot and awards one point", () => {
     assert.equal(slotNode.classList.contains("is-complete"), true);
     assert.equal(answerCard.classList.contains("is-complete"), true);
     assert.equal(game.messageNode.textContent, PRAISE_MESSAGES[0]);
-    assert.equal(game.messageNode.classList.contains("is-success"), true);
+    assert.equal(game.statusPanel.classList.contains("is-success"), true);
 });
 
 test("wrong answer returns to its card home and shows retry message", () => {
@@ -250,7 +251,7 @@ test("wrong answer returns to its card home and shows retry message", () => {
     assert.equal(answerCard.parentNode, answerHomeNode);
     assert.equal(answerHomeNode.children[0], answerCard);
     assert.equal(game.messageNode.textContent, RETRY_MESSAGE);
-    assert.equal(game.messageNode.classList.contains("is-wrong"), true);
+    assert.equal(game.statusPanel.classList.contains("is-wrong"), true);
 });
 
 test("last correct answer finishes the game", () => {
@@ -270,7 +271,7 @@ test("last correct answer finishes the game", () => {
     assert.equal(game.score, ROW_PATTERNS.length);
     assert.equal(game.scoreNode.textContent, String(ROW_PATTERNS.length));
     assert.equal(game.messageNode.textContent, FINAL_MESSAGE);
-    assert.equal(game.messageNode.classList.contains("is-finished"), true);
+    assert.equal(game.statusPanel.classList.contains("is-finished"), true);
 });
 
 test("look at rows game is placed after puzzle in the menu", () => {

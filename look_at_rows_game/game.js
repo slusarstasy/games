@@ -130,6 +130,7 @@ class LookAtRowsGame {
         this.scorePanel = config.scorePanel;
         this.scoreNode = config.scoreNode;
         this.messageNode = config.messageNode;
+        this.statusPanel = config.statusPanel;
         this.rows = config.rows;
         this.answers = config.answers;
         this.vehicles = config.vehicles;
@@ -531,10 +532,10 @@ class LookAtRowsGame {
 
     static updateMessage(game, message, stateClass) {
         game.messageNode.textContent = message;
-        game.messageNode.className = "rows-instruction";
+        game.statusPanel.className = "status-panel";
 
         if (stateClass !== "") {
-            game.messageNode.classList.add(stateClass);
+            game.statusPanel.classList.add(stateClass);
         }
     }
 
@@ -560,6 +561,7 @@ function main() {
         scorePanel: document.querySelector(".score"),
         scoreNode: document.querySelector("#score"),
         messageNode: document.querySelector("#message"),
+        statusPanel: document.querySelector(".status-panel"),
         rows: ROW_PATTERNS,
         answers: ANSWER_ITEMS,
         vehicles: VEHICLES,
