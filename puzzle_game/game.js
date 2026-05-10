@@ -5,9 +5,9 @@ const SCORE_FLIGHT_ANIMATION_DURATION_MS = 760;
 const SCORE_AWARD_ANIMATION_EASING = "cubic-bezier(0.2, 0.86, 0.32, 1)";
 const TRAY_EDGE_GAP_PX = 8;
 const TRAY_TOP_OFFSET_PX = 0;
-const TRAY_PIECE_HEIGHT_PX = 108;
-const TRAY_PIECE_MIN_WIDTH_PX = 36;
-const TRAY_PIECE_MAX_WIDTH_PX = 148;
+const TRAY_PIECE_HEIGHT_PX = 124;
+const TRAY_PIECE_MIN_WIDTH_PX = 44;
+const TRAY_PIECE_MAX_WIDTH_PX = 172;
 const START_MESSAGE = "Перетащи части в рамку. Клик по части поворачивает ее";
 const FINAL_MESSAGE = "Все пазлы собраны! Отличная работа!";
 const PRAISE_MESSAGES = [
@@ -490,7 +490,8 @@ class PuzzleGame {
         const formattedLeftPercent = Number(clampedLeftPercent.toFixed(2));
 
         return `clamp(${TRAY_EDGE_GAP_PX}px, ${formattedLeftPercent}%, `
-            + `calc(100% - min(var(--piece-tray-width), 18vw) - `
+            + "calc(100% - min(var(--piece-tray-width), "
+            + "var(--piece-tray-width-limit)) - "
             + `${TRAY_EDGE_GAP_PX}px))`;
     }
 
@@ -831,7 +832,7 @@ class PuzzleGame {
     static updatePieceNode(game, pieceNode, pieceId) {
         const piece = game.pieces.find((currentPiece) => currentPiece.id === pieceId);
         const pieceState = game.pieceStates.get(pieceId);
-        pieceNode.style.transform = `rotate(${pieceState.rotation}deg)`;
+        pieceNode.style.setProperty("--piece-rotation", `${pieceState.rotation}deg`);
         pieceNode.classList.toggle("is-placed", pieceState.slotId !== "");
         pieceNode.classList.toggle(
             "is-correct",
