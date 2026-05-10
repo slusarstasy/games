@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Посмотри на ряды</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="rows-app game-shell page-shell">
+        <header class="top-bar">
+            <div class="title-group">
+                <a class="back-link theme-link" href="../index.html">
+                    <span class="theme-icon" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" focusable="false">
+                            <path d="M7.3 3 2.4 8l4.9 5 1.2-1.2L5.8 9H14V7H5.8l2.7-2.8L7.3 3Z"></path>
+                        </svg>
+                    </span>
+                    Все игры
+                </a>
+                <h1 class="theme-title">Посмотри на ряды</h1>
+            </div>
+            <div class="score theme-surface" aria-live="polite">
+                <span>Баллы:</span>
+                <strong id="score">0</strong>
+            </div>
+        </header>
+
+        <section class="rows-board theme-panel" id="rows-board" aria-label="Игровое поле">
+            <p class="rows-instruction" id="message">
+                Посмотри на ряды. Подумай, кто следующий, перетащи
+            </p>
+            <div class="rows-workspace" id="rows-workspace" aria-label="Ряды с техникой"></div>
+        </section>
+    </main>
+
+    <script src="../shared/game-sounds.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
