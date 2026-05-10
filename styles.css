@@ -229,6 +229,74 @@
     box-shadow: inset 0 0 0 6px rgba(255, 250, 242, 0.76);
 }
 
+.preview-count-stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 10px;
+    width: min(94%, 316px);
+    padding: 16px;
+    border: 3px solid rgba(77, 131, 123, 0.22);
+    border-radius: var(--theme-radius-small);
+    background: rgba(255, 250, 242, 0.98);
+    box-shadow:
+        0 8px 0 rgba(160, 111, 70, 0.08),
+        0 15px 24px rgba(96, 70, 46, 0.13);
+    transform: rotate(2deg);
+}
+
+.preview-count-examples,
+.preview-count-puzzle {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: hidden;
+    border: 2px dashed rgba(160, 111, 70, 0.34);
+    border-radius: 12px;
+}
+
+.preview-count-examples span,
+.preview-count-puzzle span {
+    display: grid;
+    place-items: center;
+    min-height: 42px;
+    color: #7a421c;
+    border-right: 2px dashed rgba(160, 111, 70, 0.2);
+    font-weight: 900;
+    line-height: 1;
+}
+
+.preview-count-examples span:nth-child(4n),
+.preview-count-puzzle span:nth-child(4n + 1) {
+    border-right: 0;
+}
+
+.preview-count-examples span {
+    background: #ffffff;
+    font-size: 1.05rem;
+}
+
+.preview-count-puzzle {
+    position: relative;
+    min-height: 96px;
+}
+
+.preview-count-puzzle img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+    object-fit: cover;
+}
+
+.preview-count-puzzle span {
+    position: relative;
+    z-index: 1;
+    min-height: 96px;
+    background: rgba(255, 255, 255, 0.58);
+    font-size: 1.8rem;
+}
+
 .game-info {
     display: flex;
     flex-direction: column;
