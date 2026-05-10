@@ -161,13 +161,14 @@ class LookAtRowsGame {
 
             const patternNode = LookAtRowsGame.createPatternNode(game, row);
             const slotNode = LookAtRowsGame.createSlotNode(row);
+            const taskNode = LookAtRowsGame.createTaskNode(patternNode, slotNode);
             const answerHomeNode = LookAtRowsGame.createAnswerHomeNode(
                 game,
                 game.answers[rowIndex],
             );
 
             game.slotNodes.set(row.id, slotNode);
-            rowNode.append(patternNode, slotNode, answerHomeNode);
+            rowNode.append(taskNode, answerHomeNode);
             game.rowsNode.append(rowNode);
         });
     }
@@ -183,6 +184,15 @@ class LookAtRowsGame {
         }
 
         return shuffledItems;
+    }
+
+    static createTaskNode(patternNode, slotNode) {
+        const taskNode = document.createElement("div");
+
+        taskNode.className = "row-task";
+        taskNode.append(patternNode, slotNode);
+
+        return taskNode;
     }
 
     static createPatternNode(game, row) {

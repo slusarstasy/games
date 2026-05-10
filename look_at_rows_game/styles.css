@@ -62,13 +62,18 @@
 
 .sequence-row {
     display: grid;
-    grid-template-columns:
-        minmax(430px, 1fr)
-        var(--rows-card-size)
-        var(--rows-card-size);
+    grid-template-columns: minmax(560px, 1fr) var(--rows-card-size);
+    align-items: center;
+    gap: clamp(28px, 4.2vw, 58px);
+    min-height: var(--rows-card-size);
+}
+
+.row-task {
+    display: grid;
+    grid-template-columns: minmax(430px, 1fr) var(--rows-card-size);
     align-items: center;
     gap: clamp(8px, 1vw, 14px);
-    min-height: var(--rows-card-size);
+    min-height: calc(var(--rows-card-size) + 18px);
     padding: 7px;
     border: 2px solid rgba(160, 111, 70, 0.13);
     border-radius: var(--theme-radius-small);
@@ -132,7 +137,9 @@
 
 .answer-slot {
     position: relative;
-    box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.46);
+    border-style: dashed;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 0 0 8px rgba(255, 250, 242, 0.64);
 }
 
 .answer-slot.is-complete {
@@ -218,7 +225,12 @@
     }
 
     .sequence-row {
-        grid-template-columns: minmax(390px, 1fr) 88px 88px;
+        grid-template-columns: minmax(490px, 1fr) 88px;
+        gap: 30px;
+    }
+
+    .row-task {
+        grid-template-columns: minmax(390px, 1fr) 88px;
     }
 }
 
