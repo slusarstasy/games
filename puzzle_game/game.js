@@ -630,6 +630,7 @@ class PuzzleGame {
         PuzzleGame.updateScore(game);
 
         if (game.currentPuzzleIndex === game.puzzles.length - 1) {
+            GameSounds.playCompletionMusic();
             PuzzleGame.updateMessage(game, FINAL_MESSAGE, "is-finished");
             return;
         }

@@ -174,7 +174,8 @@ class MatchingGame {
     static async acceptPair(game, id) {
         game.matchedIds.add(id);
         game.isPairMoving = true;
-        GameSounds.playSuccess();
+        const isFinalPair = game.matchedIds.size === game.items.length;
+        MatchingGame.playAcceptedPairSound(isFinalPair);
 
         const imageCard = MatchingGame.findCard(game.imageColumn, id);
         const shadowCard = MatchingGame.findCard(game.shadowColumn, id);
@@ -185,7 +186,7 @@ class MatchingGame {
 
         MatchingGame.resetSelection(game);
 
-        if (game.matchedIds.size === game.items.length) {
+        if (isFinalPair) {
             MatchingGame.updateMessage(game, FINAL_MESSAGE, "is-finished");
         } else {
             MatchingGame.updateMessage(
@@ -207,6 +208,15 @@ class MatchingGame {
         MatchingGame.redrawLines(game);
         MatchingGame.awardScore(game, imageCard, shadowCard);
         game.isPairMoving = false;
+    }
+
+    static playAcceptedPairSound(isFinalPair) {
+        if (isFinalPair) {
+            GameSounds.playCompletionMusic();
+            return;
+        }
+
+        GameSounds.playSuccess();
     }
 
     static rejectPair(game) {
