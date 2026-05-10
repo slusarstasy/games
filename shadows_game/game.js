@@ -50,6 +50,13 @@ const GameAnimations = (() => {
 
     return window.GameAnimations;
 })();
+const GameSounds = (() => {
+    if (typeof require !== "undefined") {
+        return require("../shared/game-sounds.js").GameSounds;
+    }
+
+    return window.GameSounds;
+})();
 
 class MatchingGame {
     constructor(config) {
@@ -167,6 +174,7 @@ class MatchingGame {
     static async acceptPair(game, id) {
         game.matchedIds.add(id);
         game.isPairMoving = true;
+        GameSounds.playSuccess();
 
         const imageCard = MatchingGame.findCard(game.imageColumn, id);
         const shadowCard = MatchingGame.findCard(game.shadowColumn, id);
@@ -202,6 +210,7 @@ class MatchingGame {
     }
 
     static rejectPair(game) {
+        GameSounds.playError();
         MatchingGame.updateMessage(game, RETRY_MESSAGE, "is-wrong");
         MatchingGame.resetSelection(game);
     }

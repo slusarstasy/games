@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { GameAnimations } = require("../shadows_game/game-animations.js");
+const { SOUND_FILES } = require("../shared/game-sounds.js");
 
 const {
     FINAL_MESSAGE,
@@ -356,6 +357,16 @@ test("vehicle image and shadow assets exist", () => {
         assert.equal(path.basename(vehicle.image), path.basename(vehicle.shadow));
         assert.equal(fs.existsSync(imagePath), true, vehicle.image);
         assert.equal(fs.existsSync(shadowPath), true, vehicle.shadow);
+    });
+});
+
+test("game sound assets exist", () => {
+    const sharedDirectory = path.join(__dirname, "..", "shared");
+
+    Object.values(SOUND_FILES).forEach((soundPath) => {
+        const resolvedSoundPath = path.resolve(sharedDirectory, soundPath);
+
+        assert.equal(fs.existsSync(resolvedSoundPath), true, soundPath);
     });
 });
 

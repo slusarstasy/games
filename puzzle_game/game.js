@@ -13,6 +13,13 @@ const PRAISE_MESSAGES = [
     "Молодец!",
     "Супер!",
 ];
+const GameSounds = (() => {
+    if (typeof require !== "undefined") {
+        return require("../shared/game-sounds.js").GameSounds;
+    }
+
+    return window.GameSounds;
+})();
 
 const PUZZLES = [
     {
@@ -357,7 +364,18 @@ class PuzzleGame {
         const puzzle = PuzzleGame.currentPuzzle(game);
         PuzzleGame.rotatePieceState(game.pieceStates, pieceId, puzzle.rotationsEnabled);
         PuzzleGame.updatePieceNode(game, game.pieceNodes.get(pieceId), pieceId);
+        PuzzleGame.playRotationSound(game, pieceId);
         PuzzleGame.checkCurrentPuzzle(game);
+    }
+
+    static playRotationSound(game, pieceId) {
+        const pieceState = game.pieceStates.get(pieceId);
+
+        if (pieceState.slotId === "") {
+            return;
+        }
+
+        PuzzleGame.playPlacementSound(game, pieceId);
     }
 
     static startPointerDrag(game, pieceNode, pieceId, event) {
@@ -537,8 +555,20 @@ class PuzzleGame {
 
         slotNode.append(game.pieceNodes.get(pieceId));
         PuzzleGame.updatePieceNode(game, game.pieceNodes.get(pieceId), pieceId);
+        PuzzleGame.playPlacementSound(game, pieceId);
         PuzzleGame.updateSlotStates(game);
         PuzzleGame.checkCurrentPuzzle(game);
+    }
+
+    static playPlacementSound(game, pieceId) {
+        const piece = game.pieces.find((currentPiece) => currentPiece.id === pieceId);
+
+        if (PuzzleGame.isPieceCorrect(piece, game.pieceStates)) {
+            GameSounds.playSuccess();
+            return;
+        }
+
+        GameSounds.playError();
     }
 
     static returnPieceToTray(game, pieceId, placeholder) {
