@@ -170,9 +170,9 @@
 .equipment-details h2 {
     margin: 0;
     color: var(--theme-heading);
-    font-size: clamp(2.05rem, 4vw, 3.65rem);
+    font-size: clamp(1.65rem, 3vw, 2.45rem);
     font-weight: 900;
-    line-height: 0.94;
+    line-height: 1;
     text-transform: uppercase;
 }
 
