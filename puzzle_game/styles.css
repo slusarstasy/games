@@ -107,10 +107,8 @@
     width: min(100%, 780px);
     min-height: clamp(360px, 58vh, 620px);
     padding: clamp(12px, 2.2vw, 22px);
-    border: 2px solid rgba(160, 111, 70, 0.16);
-    border-radius: var(--theme-radius-small);
-    background:
-        linear-gradient(90deg, rgba(255, 250, 242, 0.94), rgba(255, 255, 255, 0.72));
+    border: 0;
+    background: transparent;
 }
 
 .puzzle-target {
