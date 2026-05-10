@@ -165,6 +165,7 @@
 
 .game-board {
     --match-card-height: clamp(74px, 10vh, 100px);
+    --match-card-width: clamp(156px, 22vw, 232px);
     --match-image-height: calc(var(--match-card-height) - 18px);
 
     position: relative;
@@ -200,11 +201,19 @@
     grid-auto-rows: var(--match-card-height);
 }
 
+.column:first-of-type {
+    justify-items: end;
+}
+
+.column:last-of-type {
+    justify-items: start;
+}
+
 .match-card {
     position: relative;
     display: grid;
     place-items: center;
-    width: 100%;
+    width: min(100%, var(--match-card-width));
     height: var(--match-card-height);
     min-height: 0;
     padding: 7px;
@@ -325,6 +334,7 @@
 
     .game-board {
         --match-card-height: 74px;
+        --match-card-width: clamp(132px, 40vw, 184px);
         --match-image-height: calc(var(--match-card-height) - 16px);
 
         gap: 18px;
