@@ -118,6 +118,7 @@ class PuzzleGame {
         PuzzleGame.updatePuzzleHeader(game, puzzle);
         PuzzleGame.updateMessage(game, START_MESSAGE, "");
         PuzzleGame.renderSlots(game, puzzle);
+        PuzzleGame.updateTrayLayout(game, puzzle);
         PuzzleGame.renderPieces(game, puzzle);
     }
 
@@ -271,11 +272,16 @@ class PuzzleGame {
     }
 
     static renderPieces(game, puzzle) {
-        game.pieces.forEach((piece) => {
+        game.pieces.forEach((piece, index) => {
             const pieceNode = PuzzleGame.createPieceNode(game, puzzle, piece);
+            pieceNode.dataset.pieceIndex = String(index);
             game.pieceNodes.set(piece.id, pieceNode);
             game.trayNode.append(pieceNode);
         });
+    }
+
+    static updateTrayLayout(game, puzzle) {
+        game.trayNode.dataset.parts = String(puzzle.rows * puzzle.columns);
     }
 
     static createPieceNode(game, puzzle, piece) {
@@ -287,6 +293,10 @@ class PuzzleGame {
         pieceNode.style.backgroundImage = `url("${piece.image}")`;
         pieceNode.style.backgroundSize = `${piece.columns * 100}% ${piece.rows * 100}%`;
         pieceNode.style.backgroundPosition = PuzzleGame.backgroundPosition(piece);
+        pieceNode.style.setProperty(
+            "--piece-tray-width",
+            `${PuzzleGame.trayPieceWidth(piece)}px`,
+        );
         pieceNode.setAttribute(
             "aria-label",
             `Часть пазла: ${piece.title}, место ${piece.row + 1}-${piece.column + 1}`,
@@ -323,6 +333,15 @@ class PuzzleGame {
         }
 
         return (index / (count - 1)) * 100;
+    }
+
+    static trayPieceWidth(piece) {
+        const pieceWidth = piece.width / piece.columns;
+        const pieceHeight = piece.height / piece.rows;
+        const aspectRatio = pieceWidth / pieceHeight;
+        const width = aspectRatio * 160;
+
+        return Math.round(Math.min(190, Math.max(96, width)));
     }
 
     static handlePieceClick(game, pieceId, event) {
@@ -364,6 +383,7 @@ class PuzzleGame {
             moveHandler,
             finishHandler,
             cancelHandler,
+            placeholder: PuzzleGame.createPiecePlaceholder(pieceNode),
             startX: event.clientX,
             startY: event.clientY,
             offsetX: event.clientX - rect.left,
@@ -409,7 +429,31 @@ class PuzzleGame {
         drag.pieceNode.style.position = "fixed";
         drag.pieceNode.style.zIndex = "30";
         drag.pieceNode.style.pointerEvents = "none";
+        PuzzleGame.placeDragPlaceholder(drag);
         document.body.append(drag.pieceNode);
+    }
+
+    static createPiecePlaceholder(pieceNode) {
+        const placeholder = document.createElement("span");
+        const trayWidth = typeof pieceNode.style.getPropertyValue === "function"
+            ? pieceNode.style.getPropertyValue("--piece-tray-width")
+            : "";
+        placeholder.className = "puzzle-piece-placeholder";
+        placeholder.dataset.pieceIndex = pieceNode.dataset.pieceIndex;
+        placeholder.style.aspectRatio = pieceNode.style.aspectRatio;
+        placeholder.style.setProperty("--piece-tray-width", trayWidth);
+
+        return placeholder;
+    }
+
+    static placeDragPlaceholder(drag) {
+        const parentNode = drag.pieceNode.parentNode;
+
+        if (parentNode === undefined || parentNode === null) {
+            return;
+        }
+
+        parentNode.insertBefore(drag.placeholder, drag.pieceNode);
     }
 
     static positionDraggedPiece(drag, clientX, clientY) {
@@ -438,9 +482,10 @@ class PuzzleGame {
         PuzzleGame.clearDraggedPieceStyles(drag.pieceNode);
 
         if (slot === null) {
-            PuzzleGame.returnPieceToTray(game, drag.pieceId);
+            PuzzleGame.returnPieceToTray(game, drag.pieceId, drag.placeholder);
         } else {
             PuzzleGame.placePieceInSlot(game, drag.pieceId, slot.dataset.slotId);
+            PuzzleGame.removePiecePlaceholder(drag.placeholder);
         }
 
         PuzzleGame.defer(() => {
@@ -496,11 +541,22 @@ class PuzzleGame {
         PuzzleGame.checkCurrentPuzzle(game);
     }
 
-    static returnPieceToTray(game, pieceId) {
+    static returnPieceToTray(game, pieceId, placeholder) {
         PuzzleGame.returnPieceStateToTray(game.pieceStates, game.slotPieces, pieceId);
-        game.trayNode.append(game.pieceNodes.get(pieceId));
+        if (placeholder.parentNode === game.trayNode) {
+            placeholder.parentNode.insertBefore(game.pieceNodes.get(pieceId), placeholder);
+        } else {
+            game.trayNode.append(game.pieceNodes.get(pieceId));
+        }
+        PuzzleGame.removePiecePlaceholder(placeholder);
         PuzzleGame.updatePieceNode(game, game.pieceNodes.get(pieceId), pieceId);
         PuzzleGame.updateSlotStates(game);
+    }
+
+    static removePiecePlaceholder(placeholder) {
+        if (placeholder.parentNode !== undefined && placeholder.parentNode !== null) {
+            placeholder.remove();
+        }
     }
 
     static updateSlotStates(game) {

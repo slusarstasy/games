@@ -38,6 +38,10 @@ class FakeDragDocument {
         this.listeners = new Map();
     }
 
+    createElement() {
+        return new FakePlaceholder();
+    }
+
     addEventListener(eventName, handler) {
         this.listeners.set(eventName, handler);
     }
@@ -47,10 +51,56 @@ class FakeDragDocument {
     }
 }
 
+class FakeParentNode {
+    constructor() {
+        this.children = [];
+    }
+
+    insertBefore(node) {
+        node.parentNode = this;
+        this.children.push(node);
+    }
+}
+
+class FakeStyle {
+    constructor() {
+        this.__properties = new Map();
+    }
+
+    setProperty(name, value) {
+        this.__properties.set(name, value);
+    }
+
+    getPropertyValue(name) {
+        return this.__properties.get(name) || "";
+    }
+}
+
+class FakePlaceholder {
+    constructor() {
+        this.className = "";
+        this.dataset = {};
+        this.parentNode = null;
+        this.removed = false;
+        this.style = new FakeStyle();
+    }
+
+    remove() {
+        this.removed = true;
+        this.parentNode = null;
+    }
+}
+
 class FakePieceNode {
     constructor() {
         this.classList = new FakeClassList();
-        this.style = {};
+        this.dataset = {
+            pieceIndex: "0",
+        };
+        this.parentNode = new FakeParentNode();
+        this.style = new FakeStyle();
+        this.style.aspectRatio = "1 / 1";
+        this.style.setProperty("--piece-tray-width", "120px");
     }
 
     getBoundingClientRect() {
@@ -166,6 +216,9 @@ test("pointer drag starts from document movement", () => {
         assert.equal(pieceNode.style.position, "fixed");
         assert.equal(pieceNode.style.left, "60px");
         assert.equal(pieceNode.style.top, "80px");
+        assert.equal(pieceNode.parentNode.children.length, 1);
+        assert.equal(pieceNode.parentNode.children[0].className, "puzzle-piece-placeholder");
+        assert.equal(pieceNode.parentNode.children[0].dataset.pieceIndex, "0");
 
         PuzzleGame.removePointerDragListeners(game.pointerDrag);
         assert.equal(fakeDocument.listeners.size, 0);

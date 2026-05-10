@@ -162,13 +162,21 @@
 }
 
 .puzzle-workspace {
+    position: relative;
     display: grid;
     gap: clamp(16px, 3vw, 34px);
     align-items: center;
     justify-items: center;
+    min-height: clamp(520px, 72vh, 760px);
+    padding:
+        clamp(96px, 11vw, 130px)
+        clamp(72px, 9vw, 132px)
+        clamp(22px, 4vw, 56px);
 }
 
 .puzzle-target-wrap {
+    position: relative;
+    z-index: 1;
     display: grid;
     place-items: center;
     width: min(100%, 780px);
@@ -243,17 +251,12 @@
 }
 
 .pieces-tray {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
-    gap: 14px;
-    align-content: center;
-    width: min(100%, 900px);
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
     min-height: 0;
-    padding: clamp(12px, 2vw, 18px);
-    border: 2px solid rgba(160, 111, 70, 0.12);
-    border-radius: var(--theme-radius-small);
-    background: rgba(255, 250, 242, 0.82);
-    box-shadow: var(--theme-shadow-soft);
+    pointer-events: none;
 }
 
 .puzzle-piece {
@@ -266,41 +269,86 @@
     border-radius: 14px;
     background-color: #ffffff;
     background-repeat: no-repeat;
-    box-shadow: 0 5px 0 rgba(160, 111, 70, 0.18);
     cursor: grab;
+    filter: drop-shadow(0 10px 10px rgba(96, 70, 46, 0.18));
     touch-action: none;
     transition:
-        border-color 140ms ease,
-        box-shadow 140ms ease,
+        filter 140ms ease,
         transform 180ms ease;
 }
 
 .pieces-tray .puzzle-piece {
-    justify-self: center;
-    max-width: 178px;
-    max-height: 240px;
+    position: absolute;
+    width: min(var(--piece-tray-width), 18vw);
+    pointer-events: auto;
+}
+
+.puzzle-piece-placeholder {
+    display: block;
+    width: min(var(--piece-tray-width), 18vw);
+    min-width: 0;
+    min-height: 0;
+    visibility: hidden;
+}
+
+.pieces-tray .puzzle-piece-placeholder {
+    position: absolute;
+}
+
+.pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="0"],
+.pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="0"] {
+    top: 8px;
+    left: clamp(10px, 7vw, 92px);
+}
+
+.pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="1"],
+.pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="1"] {
+    top: 14px;
+    right: clamp(10px, 7vw, 92px);
+}
+
+.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="0"],
+.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="0"] {
+    top: 4px;
+    left: clamp(8px, 5vw, 74px);
+}
+
+.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="1"],
+.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="1"] {
+    top: 12px;
+    right: clamp(8px, 5vw, 74px);
+}
+
+.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="2"],
+.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="2"] {
+    bottom: clamp(16px, 8vh, 78px);
+    left: clamp(6px, 4vw, 54px);
+}
+
+.pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="3"],
+.pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="3"] {
+    right: clamp(6px, 4vw, 54px);
+    bottom: clamp(16px, 8vh, 78px);
 }
 
 .puzzle-slot .puzzle-piece {
+    position: relative;
     width: 100%;
     height: 100%;
-    border-color: rgba(77, 131, 123, 0.32);
-    border-radius: 10px;
-    box-shadow: none;
+    filter: none;
 }
 
 .puzzle-piece:hover,
 .puzzle-piece:focus-visible {
-    border-color: rgba(212, 84, 23, 0.48);
     outline: none;
-    box-shadow:
-        var(--theme-focus),
-        0 5px 0 rgba(160, 111, 70, 0.2);
+    filter:
+        drop-shadow(0 12px 12px rgba(96, 70, 46, 0.2))
+        drop-shadow(0 0 7px rgba(212, 84, 23, 0.28));
 }
 
 .puzzle-slot .puzzle-piece:hover,
 .puzzle-slot .puzzle-piece:focus-visible {
-    box-shadow: var(--theme-focus);
+    filter: drop-shadow(0 0 5px rgba(212, 84, 23, 0.28));
 }
 
 .puzzle-piece:active,
@@ -309,14 +357,15 @@
 }
 
 .puzzle-piece.is-correct {
-    border-color: rgba(94, 148, 63, 0.58);
+    border-color: rgba(94, 148, 63, 0.62);
     background-color: #f7fbeb;
+    box-shadow: 0 0 0 7px rgba(94, 148, 63, 0.13);
 }
 
 .puzzle-piece.is-dragging {
-    box-shadow:
-        0 12px 24px rgba(96, 70, 46, 0.22),
-        0 0 0 8px rgba(212, 84, 23, 0.12);
+    filter:
+        drop-shadow(0 16px 18px rgba(96, 70, 46, 0.28))
+        drop-shadow(0 0 12px rgba(212, 84, 23, 0.18));
     transition: none;
 }
 
@@ -375,8 +424,42 @@
     }
 
     .pieces-tray {
+        position: relative;
+        display: grid;
         grid-template-columns: repeat(2, minmax(94px, 1fr));
+        order: -1;
+        gap: 10px;
+        justify-items: center;
+        width: 100%;
         min-height: 0;
+        pointer-events: auto;
+    }
+
+    .puzzle-workspace {
+        min-height: 0;
+        padding: 0;
+    }
+
+    .pieces-tray .puzzle-piece,
+    .pieces-tray .puzzle-piece-placeholder,
+    .pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="0"],
+    .pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="0"],
+    .pieces-tray[data-parts="2"] .puzzle-piece[data-piece-index="1"],
+    .pieces-tray[data-parts="2"] .puzzle-piece-placeholder[data-piece-index="1"],
+    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="0"],
+    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="0"],
+    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="1"],
+    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="1"],
+    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="2"],
+    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="2"],
+    .pieces-tray[data-parts="4"] .puzzle-piece[data-piece-index="3"],
+    .pieces-tray[data-parts="4"] .puzzle-piece-placeholder[data-piece-index="3"] {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        width: min(var(--piece-tray-width), 42vw);
     }
 }
 
@@ -392,11 +475,6 @@
 
     .puzzle-target-wrap {
         min-height: 260px;
-        padding: 10px;
-    }
-
-    .pieces-tray {
-        gap: 10px;
         padding: 10px;
     }
 
