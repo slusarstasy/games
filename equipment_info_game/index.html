@@ -40,11 +40,31 @@
                     </div>
 
                     <div class="audio-controls">
-                        <button class="theme-button audio-button" id="listen-audio" type="button" hidden>
-                            Слушать
+                        <button
+                            class="theme-button audio-button audio-button-listen"
+                            id="listen-audio"
+                            type="button"
+                            hidden
+                        >
+                            <span class="audio-button-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M5 3.4v9.2L12.2 8 5 3.4Z"></path>
+                                </svg>
+                            </span>
+                            <span>Слушать</span>
                         </button>
-                        <button class="theme-button audio-button" id="pause-audio" type="button" hidden>
-                            Пауза
+                        <button
+                            class="theme-button audio-button audio-button-pause"
+                            id="pause-audio"
+                            type="button"
+                            hidden
+                        >
+                            <span class="audio-button-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M4 3h3v10H4V3Zm5 0h3v10H9V3Z"></path>
+                                </svg>
+                            </span>
+                            <span>Пауза</span>
                         </button>
                     </div>
 
