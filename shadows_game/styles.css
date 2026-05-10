@@ -1,70 +1,5 @@
-.app {
+.shadows-app {
     --page-width: 1180px;
-    display: grid;
-    gap: 14px;
-    min-height: 100vh;
-    padding: clamp(18px, 3vw, 34px) 0 22px;
-}
-
-.top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.title-group {
-    display: grid;
-    gap: 6px;
-}
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    justify-self: start;
-    gap: 9px;
-    font-size: 1.1rem;
-}
-
-.back-link .theme-icon {
-    width: 34px;
-    height: 34px;
-}
-
-.back-link .theme-icon svg {
-    width: 17px;
-    height: 17px;
-}
-
-.title-group .theme-title {
-    max-width: 760px;
-    font-size: clamp(2.15rem, 4.8vw, 4.35rem);
-    line-height: 0.92;
-}
-
-.score {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    min-width: 172px;
-    padding: 12px 18px;
-    color: var(--theme-accent);
-    font-size: 1.12rem;
-    font-weight: 900;
-    transform-origin: center;
-}
-
-.score strong {
-    color: var(--theme-heading);
-    font-size: 2.25rem;
-    line-height: 1;
-}
-
-.score.is-score-awarded {
-    box-shadow:
-        0 0 0 8px rgba(94, 148, 63, 0.14),
-        var(--theme-shadow-soft);
 }
 
 .score-impulse {
@@ -88,26 +23,6 @@
     pointer-events: none;
     transform: translate(-50%, -50%) scale(0.8);
     will-change: left, top, opacity, transform;
-}
-
-.status-panel {
-    display: grid;
-    place-items: center;
-    min-height: 58px;
-    padding: 13px 18px;
-    border: 2px solid rgba(160, 111, 70, 0.12);
-    border-radius: var(--theme-radius-small);
-    background: var(--theme-surface);
-    box-shadow: var(--theme-shadow-soft);
-}
-
-.status-panel p {
-    margin: 0;
-    color: var(--theme-accent);
-    font-size: clamp(1.15rem, 2vw, 1.45rem);
-    font-weight: 900;
-    line-height: 1.25;
-    text-align: center;
 }
 
 .status-panel.is-success {
@@ -309,27 +224,8 @@
 }
 
 @media (max-width: 760px) {
-    .app {
+    .shadows-app {
         width: min(100% - 20px, 560px);
-        gap: 12px;
-        padding-top: 18px;
-    }
-
-    .top-bar {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .title-group .theme-title {
-        font-size: clamp(2rem, 12vw, 3.25rem);
-    }
-
-    .score {
-        width: 100%;
-    }
-
-    .status-panel {
-        min-height: 54px;
     }
 
     .game-board {
