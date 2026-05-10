@@ -79,7 +79,9 @@ class FakeDocument {
 class FakeAudio {
     constructor(src) {
         this.currentTime = 12;
+        this.ended = false;
         this.paused = false;
+        this.playCount = 0;
         this.played = false;
         this.src = src;
         this.volume = 0;
@@ -87,6 +89,8 @@ class FakeAudio {
     }
 
     play() {
+        this.paused = false;
+        this.playCount += 1;
         this.played = true;
 
         return Promise.resolve(true);
@@ -104,7 +108,7 @@ function withFakeDocument(callback) {
     global.document = new FakeDocument();
 
     try {
-        callback();
+        return callback();
     } finally {
         global.document = originalDocument;
     }
@@ -131,7 +135,8 @@ function buildGame() {
         titleNode: new FakeNode(),
         imageNode: new FakeNode(),
         factsNode: new FakeNode(),
-        repeatAudioButton: new FakeNode(),
+        listenAudioButton: new FakeNode(),
+        pauseAudioButton: new FakeNode(),
         items: EQUIPMENT_ITEMS,
     });
 }
@@ -175,7 +180,8 @@ test("selectItem shows vehicle text for parent reading", () => {
         assert.equal(game.titleNode.textContent, "Бульдозер");
         assert.equal(game.imageNode.src, "../data/images/бульдозер.png");
         assert.equal(game.imageNode.alt, "Бульдозер");
-        assert.equal(game.repeatAudioButton.hidden, true);
+        assert.equal(game.listenAudioButton.hidden, true);
+        assert.equal(game.pauseAudioButton.hidden, true);
         assert.equal(game.factsNode.children[0].textContent, "Где работает:");
         assert.equal(game.factsNode.children[1].textContent, "На стройке.");
         assert.equal(game.factsNode.children[14].textContent, "Для чего нужен:");
@@ -203,7 +209,8 @@ test("selectItem plays available parent voice recording", async () => {
             assert.equal(audioInstances[1].volume, VOICE_VOLUME);
             assert.equal(audioInstances[1].played, true);
             assert.equal(game.activeAudio, audioInstances[1]);
-            assert.equal(game.repeatAudioButton.hidden, false);
+            assert.equal(game.listenAudioButton.hidden, false);
+            assert.equal(game.pauseAudioButton.hidden, false);
         });
     });
 });
@@ -219,7 +226,41 @@ test("selectItem plays click sound for silent vehicles without voice", async () 
             assert.equal(audioInstances[0].src, SOUND_FILES.menuClick);
             assert.equal(audioInstances[0].played, true);
             assert.equal(game.activeAudio, null);
-            assert.equal(game.repeatAudioButton.hidden, true);
+            assert.equal(game.listenAudioButton.hidden, true);
+            assert.equal(game.pauseAudioButton.hidden, true);
+        });
+    });
+});
+
+test("pauseSelectedAudio pauses current voice without rewinding", async () => {
+    await withFakeAudio(async (audioInstances) => {
+        withFakeDocument(() => {
+            const game = buildGame();
+
+            EquipmentInfoGame.selectItem(game, "truck");
+
+            assert.equal(EquipmentInfoGame.pauseSelectedAudio(game), true);
+            assert.equal(audioInstances[1].paused, true);
+            assert.equal(audioInstances[1].currentTime, 12);
+            assert.equal(game.activeAudio, audioInstances[1]);
+        });
+    });
+});
+
+test("playSelectedAudio resumes paused voice without restarting", async () => {
+    await withFakeAudio(async (audioInstances) => {
+        await withFakeDocument(async () => {
+            const game = buildGame();
+
+            EquipmentInfoGame.selectItem(game, "truck");
+            EquipmentInfoGame.pauseSelectedAudio(game);
+
+            assert.equal(await EquipmentInfoGame.playSelectedAudio(game), true);
+            assert.equal(audioInstances.length, 2);
+            assert.equal(audioInstances[1].playCount, 2);
+            assert.equal(audioInstances[1].paused, false);
+            assert.equal(audioInstances[1].currentTime, 12);
+            assert.equal(game.activeAudio, audioInstances[1]);
         });
     });
 });

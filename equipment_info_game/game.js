@@ -318,7 +318,8 @@ class EquipmentInfoGame {
         this.titleNode = config.titleNode;
         this.imageNode = config.imageNode;
         this.factsNode = config.factsNode;
-        this.repeatAudioButton = config.repeatAudioButton;
+        this.listenAudioButton = config.listenAudioButton;
+        this.pauseAudioButton = config.pauseAudioButton;
         this.items = config.items;
         this.selectedItemId = "";
         this.activeAudio = null;
@@ -326,7 +327,8 @@ class EquipmentInfoGame {
 
     start() {
         EquipmentInfoGame.renderCards(this);
-        EquipmentInfoGame.bindReplay(this);
+        EquipmentInfoGame.bindListen(this);
+        EquipmentInfoGame.bindPause(this);
     }
 
     static renderCards(game) {
@@ -390,9 +392,15 @@ class EquipmentInfoGame {
         return button;
     }
 
-    static bindReplay(game) {
-        game.repeatAudioButton.addEventListener("click", () => {
-            EquipmentInfoGame.replaySelectedAudio(game);
+    static bindListen(game) {
+        game.listenAudioButton.addEventListener("click", () => {
+            EquipmentInfoGame.playSelectedAudio(game);
+        });
+    }
+
+    static bindPause(game) {
+        game.pauseAudioButton.addEventListener("click", () => {
+            EquipmentInfoGame.pauseSelectedAudio(game);
         });
     }
 
@@ -425,7 +433,8 @@ class EquipmentInfoGame {
         game.titleNode.textContent = item.title;
         game.imageNode.src = item.image;
         game.imageNode.alt = item.title;
-        game.repeatAudioButton.hidden = item.audio === "";
+        game.listenAudioButton.hidden = item.audio === "";
+        game.pauseAudioButton.hidden = item.audio === "";
         EquipmentInfoGame.renderFacts(game.factsNode, item);
     }
 
@@ -449,15 +458,29 @@ class EquipmentInfoGame {
         });
     }
 
-    static replaySelectedAudio(game) {
+    static playSelectedAudio(game) {
         if (game.selectedItemId === "") {
             return Promise.resolve(false);
         }
 
         const item = EquipmentInfoGame.findItem(game.items, game.selectedItemId);
+
+        if (game.activeAudio !== null && game.activeAudio.ended !== true) {
+            return EquipmentInfoGame.playAudio(game.activeAudio);
+        }
+
         EquipmentInfoGame.stopActiveAudio(game);
 
         return EquipmentInfoGame.playItemAudio(game, item);
+    }
+
+    static pauseSelectedAudio(game) {
+        if (game.activeAudio === null) {
+            return false;
+        }
+
+        game.activeAudio.pause();
+        return true;
     }
 
     static playSelectionSound() {
@@ -473,6 +496,10 @@ class EquipmentInfoGame {
         audio.volume = VOICE_VOLUME;
         game.activeAudio = audio;
 
+        return EquipmentInfoGame.playAudio(audio);
+    }
+
+    static playAudio(audio) {
         const playback = audio.play();
 
         if (playback === undefined) {
@@ -510,7 +537,8 @@ function main() {
         titleNode: document.querySelector("#equipment-title"),
         imageNode: document.querySelector("#equipment-image"),
         factsNode: document.querySelector("#equipment-facts"),
-        repeatAudioButton: document.querySelector("#repeat-audio"),
+        listenAudioButton: document.querySelector("#listen-audio"),
+        pauseAudioButton: document.querySelector("#pause-audio"),
         items: EQUIPMENT_ITEMS,
     });
 

@@ -193,8 +193,13 @@
     filter: drop-shadow(0 14px 16px rgba(96, 70, 46, 0.17));
 }
 
+.audio-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 .audio-button {
-    justify-self: start;
     color: var(--theme-surface-strong);
     background: var(--theme-accent);
 }
