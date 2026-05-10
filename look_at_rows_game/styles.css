@@ -65,7 +65,6 @@
     grid-template-columns:
         minmax(430px, 1fr)
         var(--rows-card-size)
-        clamp(58px, 7vw, 82px)
         var(--rows-card-size);
     align-items: center;
     gap: clamp(8px, 1vw, 14px);
@@ -140,20 +139,6 @@
     border-color: rgba(94, 148, 63, 0.58);
     background: #f7fbeb;
     box-shadow: 0 0 0 6px rgba(94, 148, 63, 0.1);
-}
-
-.row-connector {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-}
-
-.row-connector span {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--theme-line);
 }
 
 .answer-home {
@@ -233,12 +218,7 @@
     }
 
     .sequence-row {
-        grid-template-columns: minmax(390px, 1fr) 88px 46px 88px;
-    }
-
-    .row-connector span {
-        width: 11px;
-        height: 11px;
+        grid-template-columns: minmax(390px, 1fr) 88px 88px;
     }
 }
 

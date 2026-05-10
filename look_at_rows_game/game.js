@@ -132,7 +132,7 @@ class LookAtRowsGame {
         this.messageNode = config.messageNode;
         this.statusPanel = config.statusPanel;
         this.rows = config.rows;
-        this.answers = config.answers;
+        this.answers = LookAtRowsGame.shuffle(config.answers);
         this.vehicles = config.vehicles;
         this.score = 0;
         this.completedRows = new Set();
@@ -161,16 +161,28 @@ class LookAtRowsGame {
 
             const patternNode = LookAtRowsGame.createPatternNode(game, row);
             const slotNode = LookAtRowsGame.createSlotNode(row);
-            const connectorNode = LookAtRowsGame.createConnectorNode();
             const answerHomeNode = LookAtRowsGame.createAnswerHomeNode(
                 game,
                 game.answers[rowIndex],
             );
 
             game.slotNodes.set(row.id, slotNode);
-            rowNode.append(patternNode, slotNode, connectorNode, answerHomeNode);
+            rowNode.append(patternNode, slotNode, answerHomeNode);
             game.rowsNode.append(rowNode);
         });
+    }
+
+    static shuffle(items) {
+        const shuffledItems = [...items];
+
+        for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+            const targetIndex = Math.floor(Math.random() * (index + 1));
+            const currentItem = shuffledItems[index];
+            shuffledItems[index] = shuffledItems[targetIndex];
+            shuffledItems[targetIndex] = currentItem;
+        }
+
+        return shuffledItems;
     }
 
     static createPatternNode(game, row) {
@@ -209,18 +221,6 @@ class LookAtRowsGame {
         slotNode.setAttribute("aria-label", "Пустая клетка для ответа");
 
         return slotNode;
-    }
-
-    static createConnectorNode() {
-        const connectorNode = document.createElement("span");
-        const firstDot = document.createElement("span");
-        const secondDot = document.createElement("span");
-
-        connectorNode.className = "row-connector";
-        connectorNode.setAttribute("aria-hidden", "true");
-        connectorNode.append(firstDot, secondDot);
-
-        return connectorNode;
     }
 
     static createAnswerHomeNode(game, vehicleId) {

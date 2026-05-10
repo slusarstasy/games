@@ -138,7 +138,21 @@ function buildGame() {
     return game;
 }
 
-test("row patterns and answers match the design example", () => {
+function buildConfiguredGame() {
+    return new LookAtRowsGame({
+        boardNode: new FakeNode([]),
+        rowsNode: new FakeNode([]),
+        scorePanel: new FakeNode(["score"]),
+        scoreNode: new FakeNode([]),
+        messageNode: new FakeNode([]),
+        statusPanel: new FakeNode(["status-panel"]),
+        rows: ROW_PATTERNS,
+        answers: ANSWER_ITEMS,
+        vehicles: VEHICLES,
+    });
+}
+
+test("row patterns and answer pool match the design example", () => {
     assert.deepEqual(
         ROW_PATTERNS.map((row) => {
             return {
@@ -207,6 +221,36 @@ test("look at rows image assets exist", () => {
         assert.equal(vehicle.image, vehicle.image.normalize("NFC"));
         assert.equal(fs.existsSync(imagePath), true, vehicle.image);
     });
+});
+
+test("answer card order is shuffled for a new game", () => {
+    const originalRandom = Math.random;
+    let game;
+
+    Math.random = () => 0;
+
+    try {
+        game = buildConfiguredGame();
+    } finally {
+        Math.random = originalRandom;
+    }
+
+    assert.deepEqual(ANSWER_ITEMS, [
+        "concrete-pump",
+        "dump-truck",
+        "front-loader",
+        "crew-bus",
+        "excavator",
+        "tower-crane",
+    ]);
+    assert.deepEqual(game.answers, [
+        "dump-truck",
+        "front-loader",
+        "crew-bus",
+        "excavator",
+        "tower-crane",
+        "concrete-pump",
+    ]);
 });
 
 test("correct answer fills a slot and awards one point", () => {
