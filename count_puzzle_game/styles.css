@@ -6,6 +6,35 @@
     max-width: 860px;
 }
 
+.count-stats {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.count-stats .timer,
+.count-stats .score {
+    min-width: 158px;
+}
+
+.count-stats .timer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 18px;
+    color: var(--theme-accent);
+    font-size: 1.12rem;
+    font-weight: 900;
+}
+
+.count-stats .timer strong {
+    color: var(--theme-heading);
+    font-size: 2.25rem;
+    line-height: 1;
+}
+
 .status-panel p {
     max-width: 920px;
     font-size: 1.8rem;
@@ -201,6 +230,16 @@
 @media (max-width: 820px) {
     .count-app {
         width: min(100% - 20px, 680px);
+    }
+
+    .count-stats {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .count-stats .timer,
+    .count-stats .score {
+        width: 100%;
     }
 
     .count-board {

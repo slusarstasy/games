@@ -150,15 +150,28 @@ function withFakeDocument(callback) {
 
 function withFakeWindow(callback) {
     const originalWindow = global.window;
+    const intervals = new Map();
+    let nextIntervalId = 1;
 
     global.window = {
         setTimeout(handler) {
             handler();
         },
+        setInterval(handler) {
+            const intervalId = nextIntervalId;
+
+            nextIntervalId += 1;
+            intervals.set(intervalId, handler);
+
+            return intervalId;
+        },
+        clearInterval(intervalId) {
+            intervals.delete(intervalId);
+        },
     };
 
     try {
-        callback();
+        callback(intervals);
     } finally {
         global.window = originalWindow;
     }
@@ -188,6 +201,7 @@ function buildConfiguredGame(tasks) {
         answerGridNode: new FakeNode([]),
         scorePanel: new FakeNode(["score"]),
         scoreNode: new FakeNode([]),
+        timerNode: new FakeNode([]),
         messageNode: new FakeNode([]),
         statusPanel: new FakeNode(["status-panel"]),
         puzzle: TEST_PUZZLE,
@@ -276,6 +290,28 @@ test("tasks and answer tiles are shuffled independently", () => {
     );
 });
 
+test("timer starts from zero and formats elapsed time", () => {
+    withFakeWindow((intervals) => {
+        let game;
+
+        withFakeRandom(new Array(22).fill(0.999), () => {
+            game = buildStartedGame();
+        });
+
+        assert.equal(game.elapsedSeconds, 0);
+        assert.equal(game.timerNode.textContent, "00:00");
+        assert.equal(intervals.size, 1);
+
+        intervals.get(game.timerId)();
+        assert.equal(game.elapsedSeconds, 1);
+        assert.equal(game.timerNode.textContent, "00:01");
+
+        game.elapsedSeconds = 65;
+        CountPuzzleGame.setTimerText(game);
+        assert.equal(game.timerNode.textContent, "01:05");
+    });
+});
+
 test("correct answer reveals a tile, awards score, and advances active task", () => {
     withFakeWindow(() => {
         let game;
@@ -358,7 +394,7 @@ test("wrong answer keeps active task and shows retry message", () => {
 });
 
 test("last correct answer finishes the game and reveals the whole puzzle", () => {
-    withFakeWindow(() => {
+    withFakeWindow((intervals) => {
         let game;
 
         withFakeRandom(new Array(22).fill(0.999), () => {
@@ -383,6 +419,8 @@ test("last correct answer finishes the game and reveals the whole puzzle", () =>
         assert.equal(game.score, COUNT_TASKS.length);
         assert.equal(game.scoreNode.textContent, String(COUNT_TASKS.length));
         assert.equal(game.activeTaskId, "");
+        assert.equal(game.timerId, 0);
+        assert.equal(intervals.size, 0);
         assert.equal(game.messageNode.textContent, FINAL_MESSAGE);
         assert.equal(game.statusPanel.classList.contains("is-finished"), true);
         game.answerTiles.forEach((tile) => {

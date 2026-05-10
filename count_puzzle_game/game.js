@@ -4,6 +4,7 @@ const FINAL_MESSAGE = "Ура! Пазл открыт!";
 const PUZZLE_ROWS = 3;
 const PUZZLE_COLUMNS = 4;
 const SCORE_FLASH_DURATION_MS = 260;
+const TIMER_TICK_MS = 1000;
 const PRAISE_MESSAGES = [
     "Отлично!",
     "Получилось!",
@@ -122,6 +123,7 @@ class CountPuzzleGame {
         this.answerGridNode = config.answerGridNode;
         this.scorePanel = config.scorePanel;
         this.scoreNode = config.scoreNode;
+        this.timerNode = config.timerNode;
         this.messageNode = config.messageNode;
         this.statusPanel = config.statusPanel;
         this.puzzle = config.puzzle;
@@ -136,10 +138,14 @@ class CountPuzzleGame {
         this.answerTileNodes = new Map();
         this.activeTaskId = CountPuzzleGame.firstTaskId(this.tasks);
         this.isComplete = false;
+        this.elapsedSeconds = 0;
+        this.timerId = 0;
     }
 
     start() {
         CountPuzzleGame.setScoreText(this);
+        CountPuzzleGame.resetTimer(this);
+        CountPuzzleGame.startTimer(this);
         CountPuzzleGame.updateMessage(this, START_MESSAGE, "");
         CountPuzzleGame.renderTasks(this);
         CountPuzzleGame.renderAnswerTiles(this);
@@ -316,6 +322,7 @@ class CountPuzzleGame {
     static completeGame(game) {
         game.isComplete = true;
         game.activeTaskId = "";
+        CountPuzzleGame.stopTimer(game);
         game.answerTiles.forEach((tile) => {
             game.revealedTileIds.add(tile.id);
             CountPuzzleGame.revealTile(game, tile.id);
@@ -384,6 +391,76 @@ class CountPuzzleGame {
         game.scoreNode.textContent = String(game.score);
     }
 
+    static resetTimer(game) {
+        game.elapsedSeconds = 0;
+        CountPuzzleGame.setTimerText(game);
+    }
+
+    static startTimer(game) {
+        CountPuzzleGame.stopTimer(game);
+        game.timerId = CountPuzzleGame.setRepeatingTimer(() => {
+            CountPuzzleGame.tickTimer(game);
+        }, TIMER_TICK_MS);
+    }
+
+    static stopTimer(game) {
+        if (game.timerId === 0) {
+            return;
+        }
+
+        CountPuzzleGame.clearRepeatingTimer(game.timerId);
+        game.timerId = 0;
+    }
+
+    static tickTimer(game) {
+        if (game.isComplete) {
+            return;
+        }
+
+        game.elapsedSeconds += 1;
+        CountPuzzleGame.setTimerText(game);
+    }
+
+    static setTimerText(game) {
+        game.timerNode.textContent = CountPuzzleGame.formatTime(game.elapsedSeconds);
+    }
+
+    static formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        const paddedMinutes = CountPuzzleGame.paddedTime(minutes);
+        const paddedSeconds = CountPuzzleGame.paddedTime(remainingSeconds);
+
+        return `${paddedMinutes}:${paddedSeconds}`;
+    }
+
+    static paddedTime(value) {
+        return String(value).padStart(2, "0");
+    }
+
+    static setRepeatingTimer(handler, durationMs) {
+        if (
+            typeof window !== "undefined"
+            && typeof window.setInterval === "function"
+        ) {
+            return window.setInterval(handler, durationMs);
+        }
+
+        return setInterval(handler, durationMs);
+    }
+
+    static clearRepeatingTimer(timerId) {
+        if (
+            typeof window !== "undefined"
+            && typeof window.clearInterval === "function"
+        ) {
+            window.clearInterval(timerId);
+            return;
+        }
+
+        clearInterval(timerId);
+    }
+
     static updateMessage(game, message, stateClass) {
         game.messageNode.textContent = message;
         game.statusPanel.className = "status-panel";
@@ -414,6 +491,7 @@ function main() {
         answerGridNode: document.querySelector("#answer-grid"),
         scorePanel: document.querySelector(".score"),
         scoreNode: document.querySelector("#score"),
+        timerNode: document.querySelector("#timer"),
         messageNode: document.querySelector("#message"),
         statusPanel: document.querySelector(".status-panel"),
         puzzle: COUNT_PUZZLE,
