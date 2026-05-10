@@ -29,6 +29,13 @@
     will-change: left, top, opacity, transform;
 }
 
+.status-panel p {
+    max-width: 880px;
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    line-height: 1.12;
+    text-wrap: balance;
+}
+
 .status-panel.is-success {
     border-color: rgba(94, 148, 63, 0.28);
     background: #f3f8df;
