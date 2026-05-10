@@ -9,6 +9,7 @@ const {
     EquipmentInfoGame,
     VOICE_VOLUME,
 } = require("../equipment_info_game/game.js");
+const { SOUND_FILES } = require("../shared/game-sounds.js");
 
 class FakeClassList {
     constructor() {
@@ -192,26 +193,31 @@ test("selectItem plays available parent voice recording", async () => {
 
             EquipmentInfoGame.selectItem(game, "excavator");
 
-            assert.equal(audioInstances.length, 1);
+            assert.equal(audioInstances.length, 2);
+            assert.equal(audioInstances[0].src, SOUND_FILES.menuClick);
+            assert.equal(audioInstances[0].played, true);
             assert.equal(
-                audioInstances[0].src,
+                audioInstances[1].src,
                 "../data/Voice_information_about_construction_equipment/Экскаватор.m4a",
             );
-            assert.equal(audioInstances[0].volume, VOICE_VOLUME);
-            assert.equal(audioInstances[0].played, true);
+            assert.equal(audioInstances[1].volume, VOICE_VOLUME);
+            assert.equal(audioInstances[1].played, true);
+            assert.equal(game.activeAudio, audioInstances[1]);
             assert.equal(game.repeatAudioButton.hidden, false);
         });
     });
 });
 
-test("selectItem keeps silent vehicles text-only", async () => {
+test("selectItem plays click sound for silent vehicles without voice", async () => {
     await withFakeAudio(async (audioInstances) => {
         withFakeDocument(() => {
             const game = buildGame();
 
             EquipmentInfoGame.selectItem(game, "front-loader");
 
-            assert.equal(audioInstances.length, 0);
+            assert.equal(audioInstances.length, 1);
+            assert.equal(audioInstances[0].src, SOUND_FILES.menuClick);
+            assert.equal(audioInstances[0].played, true);
             assert.equal(game.activeAudio, null);
             assert.equal(game.repeatAudioButton.hidden, true);
         });
@@ -226,9 +232,15 @@ test("selectItem stops previous voice before changing vehicles", async () => {
             EquipmentInfoGame.selectItem(game, "truck");
             EquipmentInfoGame.selectItem(game, "roller");
 
-            assert.equal(audioInstances.length, 1);
-            assert.equal(audioInstances[0].paused, true);
-            assert.equal(audioInstances[0].currentTime, 0);
+            assert.equal(audioInstances.length, 3);
+            assert.equal(audioInstances[0].src, SOUND_FILES.menuClick);
+            assert.equal(
+                audioInstances[1].src,
+                "../data/Voice_information_about_construction_equipment/Грузовик.m4a",
+            );
+            assert.equal(audioInstances[1].paused, true);
+            assert.equal(audioInstances[1].currentTime, 0);
+            assert.equal(audioInstances[2].src, SOUND_FILES.menuClick);
             assert.equal(game.activeAudio, null);
         });
     });

@@ -43,6 +43,13 @@ const DETAIL_FIELDS = [
 ];
 
 const VOICE_VOLUME = 1;
+const GameSounds = (() => {
+    if (typeof require !== "undefined") {
+        return require("../shared/game-sounds.js").GameSounds;
+    }
+
+    return window.GameSounds;
+})();
 
 const EQUIPMENT_ITEMS = [
     {
@@ -394,6 +401,7 @@ class EquipmentInfoGame {
 
         game.selectedItemId = item.id;
         EquipmentInfoGame.stopActiveAudio(game);
+        EquipmentInfoGame.playSelectionSound();
         EquipmentInfoGame.showItem(game, item);
         EquipmentInfoGame.setActiveCard(game, item.id);
 
@@ -450,6 +458,10 @@ class EquipmentInfoGame {
         EquipmentInfoGame.stopActiveAudio(game);
 
         return EquipmentInfoGame.playItemAudio(game, item);
+    }
+
+    static playSelectionSound() {
+        return GameSounds.playMenuClick();
     }
 
     static playItemAudio(game, item) {
