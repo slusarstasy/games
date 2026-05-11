@@ -129,9 +129,9 @@ class FakeDocument {
 
 const TEST_PUZZLE = {
     title: "Каток",
-    image: "../data/images/каток.png",
-    width: 755,
-    height: 578,
+    image: "../data/images/каток_на_дороге_пазл.png",
+    width: 1024,
+    height: 768,
     rows: 3,
     columns: 4,
 };
