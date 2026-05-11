@@ -290,7 +290,7 @@ test("tasks and answer tiles are shuffled independently", () => {
     );
 });
 
-test("timer starts from zero and formats elapsed time", () => {
+test("timer waits for the first answer and formats elapsed time", () => {
     withFakeWindow((intervals) => {
         let game;
 
@@ -300,6 +300,15 @@ test("timer starts from zero and formats elapsed time", () => {
 
         assert.equal(game.elapsedSeconds, 0);
         assert.equal(game.timerNode.textContent, "00:00");
+        assert.equal(game.timerId, 0);
+        assert.equal(intervals.size, 0);
+
+        const wrongTile = game.answerTiles.find((tile) => {
+            return tile.answer !== CountPuzzleGame.activeTask(game).answer;
+        });
+
+        assert.equal(CountPuzzleGame.handleAnswerClick(game, wrongTile.id), false);
+        assert.notEqual(game.timerId, 0);
         assert.equal(intervals.size, 1);
 
         intervals.get(game.timerId)();

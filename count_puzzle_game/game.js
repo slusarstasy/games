@@ -145,7 +145,6 @@ class CountPuzzleGame {
     start() {
         CountPuzzleGame.setScoreText(this);
         CountPuzzleGame.resetTimer(this);
-        CountPuzzleGame.startTimer(this);
         CountPuzzleGame.updateMessage(this, START_MESSAGE, "");
         CountPuzzleGame.renderTasks(this);
         CountPuzzleGame.renderAnswerTiles(this);
@@ -261,6 +260,8 @@ class CountPuzzleGame {
 
         const tile = CountPuzzleGame.findAnswerTile(game.answerTiles, tileId);
         const task = CountPuzzleGame.activeTask(game);
+
+        CountPuzzleGame.startTimer(game);
 
         if (!CountPuzzleGame.isCorrectAnswer(task, tile)) {
             CountPuzzleGame.rejectAnswer(game);
@@ -392,12 +393,16 @@ class CountPuzzleGame {
     }
 
     static resetTimer(game) {
+        CountPuzzleGame.stopTimer(game);
         game.elapsedSeconds = 0;
         CountPuzzleGame.setTimerText(game);
     }
 
     static startTimer(game) {
-        CountPuzzleGame.stopTimer(game);
+        if (game.timerId !== 0) {
+            return;
+        }
+
         game.timerId = CountPuzzleGame.setRepeatingTimer(() => {
             CountPuzzleGame.tickTimer(game);
         }, TIMER_TICK_MS);
