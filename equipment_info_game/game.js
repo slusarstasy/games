@@ -93,7 +93,7 @@ const EQUIPMENT_ITEMS = [
         title: "Самосвал",
         category: "Грузовой транспорт",
         image: "../data/images/самосвал.png",
-        audio: "../data/Voice_information_about_construction_equipment/Самосвал.m4a",
+        audio: "../data/voices/Самосвал.m4a",
         details: {
             workplace: "На стройке, в карьере.",
             size: "Большой.",
@@ -110,7 +110,7 @@ const EQUIPMENT_ITEMS = [
         title: "Бетономешалка",
         category: "Грузовой транспорт",
         image: "../data/images/бетономешалка.png",
-        audio: "../data/Voice_information_about_construction_equipment/Бетономешалка.m4a",
+        audio: "../data/voices/Бетономешалка.m4a",
         details: {
             workplace: "На стройке.",
             size: "Большая.",
@@ -127,7 +127,7 @@ const EQUIPMENT_ITEMS = [
         title: "Грузовик",
         category: "Грузовой транспорт",
         image: "../data/images/грузовик.png",
-        audio: "../data/Voice_information_about_construction_equipment/Грузовик.m4a",
+        audio: "../data/voices/Грузовик.m4a",
         details: {
             workplace: "На дороге, на стройке.",
             size: "Средний или большой.",
@@ -144,7 +144,7 @@ const EQUIPMENT_ITEMS = [
         title: "Башенный кран",
         category: "Подъёмная техника",
         image: "../data/images/башенный_кран.png",
-        audio: "",
+        audio: "../data/voices/Башенный кран.m4a",
         details: {
             workplace: "На стройке.",
             size: "Очень высокий.",
@@ -161,7 +161,7 @@ const EQUIPMENT_ITEMS = [
         title: "Автокран",
         category: "Подъёмная техника",
         image: "../data/images/автокран.png",
-        audio: "../data/Voice_information_about_construction_equipment/Автокран.m4a",
+        audio: "../data/voices/Автокран.m4a",
         details: {
             workplace: "На стройке.",
             size: "Большой.",
@@ -178,7 +178,7 @@ const EQUIPMENT_ITEMS = [
         title: "Подъёмник",
         category: "Подъёмная техника",
         image: "../data/images/подъёмник.png",
-        audio: "",
+        audio: "../data/voices/Подъёмник.m4a",
         details: {
             workplace: "На стройке, в зданиях.",
             size: "Средний.",
@@ -195,7 +195,7 @@ const EQUIPMENT_ITEMS = [
         title: "Экскаватор",
         category: "Землеройная техника",
         image: "../data/images/экскаватор.png",
-        audio: "../data/Voice_information_about_construction_equipment/Экскаватор.m4a",
+        audio: "../data/voices/Экскаватор.m4a",
         details: {
             workplace: "На стройке, в карьере.",
             size: "Большой.",
@@ -212,7 +212,7 @@ const EQUIPMENT_ITEMS = [
         title: "Бульдозер",
         category: "Землеройная техника",
         image: "../data/images/бульдозер.png",
-        audio: "",
+        audio: "../data/voices/Бульдозер.m4a",
         details: {
             workplace: "На стройке.",
             size: "Большой.",
@@ -229,7 +229,7 @@ const EQUIPMENT_ITEMS = [
         title: "Фронтальный погрузчик",
         category: "Землеройная техника",
         image: "../data/images/фронтальный_погрузчик.png",
-        audio: "",
+        audio: "../data/voices/Фронтальный погрузчик.m4a",
         details: {
             workplace: "На стройке.",
             size: "Средний.",
@@ -246,7 +246,7 @@ const EQUIPMENT_ITEMS = [
         title: "Каток",
         category: "Спецтехника для укладки и работ",
         image: "../data/images/каток.png",
-        audio: "",
+        audio: "../data/voices/Каток.m4a",
         details: {
             workplace: "На дороге.",
             size: "Большой.",
@@ -263,7 +263,7 @@ const EQUIPMENT_ITEMS = [
         title: "Асфальтоукладчик",
         category: "Спецтехника для укладки и работ",
         image: "../data/images/асфальтоукладчик.png",
-        audio: "",
+        audio: "../data/voices/Асфальтоукладчик.m4a",
         details: {
             workplace: "На дороге.",
             size: "Большой.",
@@ -280,7 +280,7 @@ const EQUIPMENT_ITEMS = [
         title: "Вахтовый автобус",
         category: "Транспорт для рабочих",
         image: "../data/images/вахтовый_автобус.png",
-        audio: "",
+        audio: "../data/voices/Вахтовый автобус.m4a",
         details: {
             workplace: "На дороге.",
             size: "Большой.",
@@ -297,7 +297,7 @@ const EQUIPMENT_ITEMS = [
         title: "Микроавтобус",
         category: "Транспорт для рабочих",
         image: "../data/images/микроавтобус.png",
-        audio: "",
+        audio: "../data/voices/Микроавтобус.m4a",
         details: {
             workplace: "На дороге.",
             size: "Маленький или средний.",
@@ -314,7 +314,7 @@ const EQUIPMENT_ITEMS = [
         title: "Бетононасос",
         category: "Техника для подачи материала",
         image: "../data/images/бетононасос.png",
-        audio: "",
+        audio: "../data/voices/Бетононасос.m4a",
         details: {
             workplace: "На стройке.",
             size: "Большой.",
@@ -331,7 +331,7 @@ const EQUIPMENT_ITEMS = [
         title: "Растворонасос",
         category: "Техника для подачи материала",
         image: "../data/images/растворонасос.png",
-        audio: "",
+        audio: "../data/voices/Растворонасос.m4a",
         details: {
             workplace: "На стройке.",
             size: "Средний.",
@@ -447,9 +447,12 @@ class EquipmentInfoGame {
 
         game.selectedItemId = item.id;
         EquipmentInfoGame.stopActiveAudio(game);
-        EquipmentInfoGame.playSelectionSound();
         EquipmentInfoGame.showItem(game, item);
         EquipmentInfoGame.setActiveCard(game, item.id);
+
+        if (item.audio === "") {
+            EquipmentInfoGame.playSelectionSound();
+        }
 
         return EquipmentInfoGame.playItemAudio(game, item);
     }
