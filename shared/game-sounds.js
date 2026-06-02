@@ -14,13 +14,13 @@
         return document.currentScript.src;
     })();
     const SOUND_FILES = {
-        completion: "../data/sounds/all-complete.wav",
+        completion: "../data/sounds/completion-chime.wav",
         error: "../data/sounds/error.wav",
         menuClick: "../data/sounds/menu-click.wav",
         success: "../data/sounds/success.wav",
     };
     const CLICK_VOLUME = 0.28;
-    const MUSIC_VOLUME = 0.24;
+    const MUSIC_VOLUME = 0.36;
     const SOUND_VOLUME = 0.32;
 
     class GameSounds {
