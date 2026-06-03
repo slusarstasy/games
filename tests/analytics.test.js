@@ -5,8 +5,7 @@ const path = require("node:path");
 
 const {
     GameAnalytics,
-    METRIKA_INIT_OPTIONS,
-    METRIKA_TAG_URL,
+    METRIKA_TAG_BASE_URL,
     PROMOTION_LINKS,
     YANDEX_METRIKA_COUNTER_ID,
 } = require("../shared/analytics.js");
@@ -26,6 +25,7 @@ class FakeScriptParent {
 
 class FakeDocument {
     constructor(scriptNodes) {
+        this.referrer = "https://example.com/";
         this.scriptNodes = scriptNodes;
         this.createdNodes = [];
     }
@@ -64,13 +64,21 @@ function buildFakeDocument() {
     };
 }
 
+function buildWindowObject() {
+    return {
+        location: {
+            href: "https://slusarstasy.github.io/games/",
+        },
+    };
+}
+
 test("analytics has configured metrika counter id", () => {
     assert.equal(YANDEX_METRIKA_COUNTER_ID, "109614802");
 });
 
 test("analytics is disabled for empty metrika counter id", () => {
     const { documentNode } = buildFakeDocument();
-    const windowObject = {};
+    const windowObject = buildWindowObject();
 
     assert.equal(
         GameAnalytics.install(
@@ -86,7 +94,8 @@ test("analytics is disabled for empty metrika counter id", () => {
 test("analytics installs yandex metrika tag for numeric counter id", () => {
     const counterId = "12345678";
     const { documentNode, firstScript, scriptParent } = buildFakeDocument();
-    const windowObject = {};
+    const windowObject = buildWindowObject();
+    const metrikaTagUrl = GameAnalytics.buildMetrikaTagUrl(counterId);
 
     assert.equal(
         GameAnalytics.install(windowObject, documentNode, counterId),
@@ -96,31 +105,48 @@ test("analytics installs yandex metrika tag for numeric counter id", () => {
     assert.equal(scriptParent.insertedNodes.length, 1);
     assert.equal(scriptParent.insertedNodes[0].referenceNode, firstScript);
     assert.equal(scriptParent.insertedNodes[0].newNode.async, true);
-    assert.equal(scriptParent.insertedNodes[0].newNode.src, METRIKA_TAG_URL);
+    assert.equal(scriptParent.insertedNodes[0].newNode.src, metrikaTagUrl);
     assert.equal(windowObject.ym.a.length, 1);
     assert.equal(windowObject.ym.a[0][0], Number(counterId));
     assert.equal(windowObject.ym.a[0][1], "init");
-    assert.deepEqual(windowObject.ym.a[0][2], METRIKA_INIT_OPTIONS);
+    assert.deepEqual(windowObject.ym.a[0][2], {
+        accurateTrackBounce: true,
+        clickmap: true,
+        referrer: documentNode.referrer,
+        ssr: true,
+        trackLinks: true,
+        url: windowObject.location.href,
+        webvisor: false,
+    });
     assert.equal(windowObject.ym.a[0][2].webvisor, false);
 });
 
 test("analytics does not install metrika tag twice", () => {
+    const counterId = "12345678";
+    const metrikaTagUrl = GameAnalytics.buildMetrikaTagUrl(counterId);
     const firstScript = {
         parentNode: new FakeScriptParent(),
         src: "game.js",
     };
     const metrikaScript = {
         parentNode: new FakeScriptParent(),
-        src: METRIKA_TAG_URL,
+        src: metrikaTagUrl,
     };
     const documentNode = new FakeDocument([firstScript, metrikaScript]);
-    const windowObject = {};
+    const windowObject = buildWindowObject();
 
     assert.equal(
-        GameAnalytics.install(windowObject, documentNode, "12345678"),
+        GameAnalytics.install(windowObject, documentNode, counterId),
         true,
     );
     assert.equal(firstScript.parentNode.insertedNodes.length, 0);
+});
+
+test("analytics builds metrika tag url with counter id", () => {
+    assert.equal(
+        GameAnalytics.buildMetrikaTagUrl("12345678"),
+        `${METRIKA_TAG_BASE_URL}?id=12345678`,
+    );
 });
 
 test("all game html pages include analytics script", () => {
