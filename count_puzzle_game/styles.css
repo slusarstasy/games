@@ -243,7 +243,7 @@
     }
 
     .count-board {
-        --count-cell-min-height: 78px;
+        --count-cell-min-height: clamp(62px, 18vw, 78px);
         padding: 12px;
     }
 
@@ -261,34 +261,35 @@
     }
 
     .count-task {
-        font-size: 2.6rem;
+        font-size: clamp(1.35rem, 5.4vw, 1.75rem);
+        white-space: nowrap;
     }
 
     .count-answer-value {
-        font-size: 2.8rem;
+        min-width: clamp(42px, 13vw, 58px);
+        min-height: clamp(40px, 12vw, 54px);
+        padding: 6px 8px;
+        border-radius: 12px;
+        font-size: clamp(2rem, 8.5vw, 2.8rem);
     }
 
     .count-answer-tile.is-revealed .count-answer-value {
-        font-size: 2rem;
+        font-size: clamp(1.45rem, 6.2vw, 2rem);
     }
 
     .count-task-grid,
     .count-answer-grid {
-        min-width: 640px;
+        width: 100%;
+        min-width: 0;
     }
 
-    .count-board {
-        overflow-x: auto;
+    .count-answer-tile {
+        min-height: 0;
     }
 }
 
 @media (max-width: 520px) {
     .count-board {
         gap: 14px;
-    }
-
-    .count-task-grid,
-    .count-answer-grid {
-        min-width: 600px;
     }
 }
