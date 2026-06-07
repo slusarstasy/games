@@ -294,3 +294,54 @@
         gap: 14px;
     }
 }
+
+@media (min-width: 821px) and (max-height: 820px) {
+    .count-stats {
+        gap: 8px;
+    }
+
+    .count-stats .timer,
+    .count-stats .score {
+        min-width: 140px;
+    }
+
+    .count-stats .timer {
+        padding: 8px 14px;
+        font-size: 1rem;
+    }
+
+    .count-stats .timer strong {
+        font-size: 1.9rem;
+    }
+
+    .count-board {
+        --count-cell-min-height: clamp(54px, 8vh, 68px);
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .count-task {
+        font-size: clamp(1.55rem, 4vh, 2.1rem);
+        white-space: nowrap;
+    }
+
+    .count-answer-tile {
+        min-height: clamp(54px, 8.2vh, 70px);
+    }
+
+    .count-answer-grid {
+        width: min(100%, 480px);
+    }
+
+    .count-answer-value {
+        min-width: clamp(42px, 5.2vw, 60px);
+        min-height: clamp(38px, 5vh, 52px);
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-size: clamp(1.65rem, 4.4vh, 2.25rem);
+    }
+
+    .count-answer-tile.is-revealed .count-answer-value {
+        font-size: clamp(1.35rem, 3.6vh, 1.85rem);
+    }
+}

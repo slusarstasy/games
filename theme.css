@@ -263,3 +263,55 @@ img {
         width: 100%;
     }
 }
+
+@media (min-width: 821px) and (max-height: 820px) {
+    .game-shell {
+        gap: 8px;
+        min-height: auto;
+        padding: 8px 0 0;
+    }
+
+    .game-shell .top-bar {
+        gap: 14px;
+    }
+
+    .game-shell .back-link {
+        gap: 7px;
+        font-size: 0.95rem;
+    }
+
+    .game-shell .back-link .theme-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .game-shell .back-link .theme-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .game-shell .title-group .theme-title {
+        font-size: clamp(2rem, 3.7vw, 3.25rem);
+        line-height: 0.9;
+    }
+
+    .game-shell .score {
+        min-width: 140px;
+        padding: 8px 14px;
+        font-size: 1rem;
+    }
+
+    .game-shell .score strong {
+        font-size: 1.9rem;
+    }
+
+    .game-shell .status-panel {
+        min-height: 44px;
+        padding: 8px 14px;
+    }
+
+    .game-shell .status-panel p {
+        font-size: clamp(1rem, 1.45vw, 1.18rem);
+        line-height: 1.15;
+    }
+}

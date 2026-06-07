@@ -364,3 +364,47 @@
         max-height: 220px;
     }
 }
+
+@media (min-width: 821px) and (max-height: 820px) {
+    .puzzle-app {
+        --piece-tray-width-limit: 18vw;
+    }
+
+    .puzzle-board {
+        gap: 6px;
+        padding: 10px;
+    }
+
+    .puzzle-progress {
+        min-height: 34px;
+        font-size: clamp(1rem, 1.6vw, 1.3rem);
+    }
+
+    .puzzle-workspace {
+        grid-template-rows: clamp(104px, 16vh, 126px) minmax(0, 1fr);
+        gap: 6px;
+        min-height: clamp(350px, 58vh, 470px);
+        padding: 0 clamp(28px, 4vw, 52px) 8px;
+    }
+
+    .puzzle-target-wrap {
+        min-height: clamp(220px, 35vh, 300px);
+        padding: 8px;
+    }
+
+    .puzzle-target {
+        width: min(100%, 460px);
+        max-height: 38vh;
+    }
+
+    .pieces-tray {
+        min-height: 104px;
+    }
+
+    .pieces-tray .puzzle-piece,
+    .pieces-tray .puzzle-piece-placeholder {
+        width: auto;
+        height: clamp(92px, 15vh, 118px);
+        max-width: min(var(--piece-tray-width), var(--piece-tray-width-limit));
+    }
+}
